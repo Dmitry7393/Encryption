@@ -15,6 +15,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 
+import AES.Decrypt;
 import AES.Encrypt;
 
 public class Encryption {
@@ -61,13 +62,13 @@ public class Encryption {
 					
 					System.out.println("From main class123");
 					// Append a row 
-					StringBuffer strBuffer1 = new StringBuffer();
+					/*StringBuffer strBuffer1 = new StringBuffer();
 					StringBuffer strBuffer2 = new StringBuffer();
 					StringBuffer strBuffer3 = new StringBuffer();
-					StringBuffer strBuffer4 = new StringBuffer();
+					StringBuffer strBuffer4 = new StringBuffer();*/
 					for(int i = 0; i < 4; i++)
 					{
-						strBuffer1.setLength(0);
+					/*	strBuffer1.setLength(0);
 						strBuffer2.setLength(0);
 						strBuffer3.setLength(0);
 						strBuffer4.setLength(0);
@@ -75,14 +76,14 @@ public class Encryption {
 						strBuffer1.append(Long.toHexString(r[i][0]).toUpperCase());
 						strBuffer2.append(Long.toHexString(r[i][1]).toUpperCase());
 						strBuffer3.append(Long.toHexString(r[i][2]).toUpperCase());
-						strBuffer4.append(Long.toHexString(r[i][3]).toUpperCase());
+						strBuffer4.append(Long.toHexString(r[i][3]).toUpperCase());*/
 						
-						model.addRow(new Object[]{strBuffer1.toString(), strBuffer2.toString(),
-												  strBuffer3.toString(), strBuffer4.toString() });
-						strBuffer1.setLength(0);
+						model.addRow(new Object[]{Integer.toString(r[i][0]), Integer.toString(r[i][1]),
+								Integer.toString(r[i][2]), Integer.toString(r[i][3]) });
+						/*strBuffer1.setLength(0);
 						strBuffer2.setLength(0);
 						strBuffer3.setLength(0);
-						strBuffer4.setLength(0);
+						strBuffer4.setLength(0);*/
 						
 					}
 					jlab.setText(str_key);
@@ -92,11 +93,17 @@ public class Encryption {
 		jbtn2.addActionListener(new ActionListener() 
 		{
 			public void actionPerformed(ActionEvent e) {
-				  String str1 = (String) table.getModel().getValueAt(1, 0);
-				  int t = Integer.parseInt(str1);
-				  System.out.println("r " + t);
-					//Decrypt d = new Decrypt()
-
+				String plain_text = "";
+				for(int j = 0; j < 4; j++) //first - rows
+				{
+					for(int i = 0; i < 4; i++)
+					{
+						plain_text = plain_text + (String) table.getModel().getValueAt(i, j) + " ";
+					}
+				}
+				Decrypt d = new Decrypt(plain_text, jtf.getText());
+				String source_text = d.get_text();
+				jlab.setText(source_text);
 			}
 			
 		});
