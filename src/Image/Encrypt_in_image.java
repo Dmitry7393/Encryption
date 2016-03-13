@@ -9,12 +9,22 @@ import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
 
 public class Encrypt_in_image {
-	public Encrypt_in_image(String path, String ciphertext2) throws IOException
+	private int[] get_ciphertext(String source_string)
+	{
+		int[] s = new int[16];
+		String[] arr = source_string.split(" ");
+		System.out.println("source_stringd " + source_string);
+		for (int i = 0; i < arr.length; i++)
+		{
+			s[i] = Integer.parseInt(arr[i]) ;
+		}
+		return s;
+	}
+	public Encrypt_in_image(String path, String str_ciphertext) throws IOException
 	{
 		BufferedImage img = ImageIO.read(new File(path)); 
 		
-		  int[] ciphertext = new int[] {-115, 121, 73, -70, 45, 105,
-				  -79, -59, 12, 123, -92, -66, -111, 110, -1, -70 };
+		int[] ciphertext = get_ciphertext(str_ciphertext);
 		int  clr ;
 		int  red;
 	  	int  green;
@@ -62,12 +72,6 @@ public class Encrypt_in_image {
 		    File outputfile = new File(file.getPath());
 			  ImageIO.write(img, "png", outputfile);
 		  }
-		 /* int position_point = path.lastIndexOf('.');
-		  String first_part = path.substring(0, position_point) +  "7" + path.substring(position_point, path.length());
-		  System.out.println("point = " + position_point);
-		  File outputfile = new File(first_part);
-		  ImageIO.write(img, "png", outputfile);
-		  */
 	}
 	
 }

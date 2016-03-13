@@ -22,8 +22,10 @@ import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
@@ -34,18 +36,20 @@ import Image.Encrypt_in_image;
 public class Encryption  {
 	private JButton btn_encrypt = new JButton("Encrypt");
 	private JButton btn_decrypt = new JButton("Decrypt");
-	private JButton btn_encrypt_image = new JButton("Image");
+	private JButton btn_encrypt_image = new JButton("Save to image");
+	private JButton btn_open_image = new JButton("Open original");
 	private JLabel str_key = new JLabel("Key");
 	private JLabel str_plaintext = new JLabel("Plaintext");
 	private JLabel str_ciphertext = new JLabel("Ciphertext");
 	private JTextField jtf_plaintext ;
 	private JTextField jtf_key ;
 	private JTextField jtf_ciphertext ;
-	private JTextArea textArea = new JTextArea (5, 20);
+	//private JTextArea textArea = new JTextArea (5, 5);
 	private JButton open_file = new JButton("Open file to decrypt");
 	private GridBagConstraints gbc ;
 	private  JLabel picLabel = new JLabel();
 	private Image image_original;
+	private JTabbedPane  tab = new JTabbedPane();
 	Boolean show_image = false;
 
 	 Encryption() throws IOException 
@@ -72,7 +76,7 @@ public class Encryption  {
 
 		   jtf_key = new JTextField(12);
 		   jtf_plaintext = new JTextField(12);
-		   jtf_ciphertext = new JTextField(28);
+		   jtf_ciphertext = new JTextField(12);
 		jtf_key.setText("Thats my Kung Fu");
 		jtf_plaintext.setText("Two One Nine Two");
 		JLabel jlab = new JLabel("_________");
@@ -117,43 +121,50 @@ public class Encryption  {
 				  File file = fileChooser.getSelectedFile();
 				 String plain_text = read_file(file.getPath());
 				 jtf_ciphertext.setText(plain_text);
-				 textArea.setText(plain_text);
+				// textArea.setText(plain_text);
 				}
 			}
 		});
 		btn_encrypt_image.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent arg0) {
-				JFileChooser fileChooser = new JFileChooser("D:\\");
-				if (fileChooser.showOpenDialog(open_file) == JFileChooser.APPROVE_OPTION) {
-				  File file = fileChooser.getSelectedFile();
-				  ImageIcon icon = new ImageIcon(file.getPath());
-				  Image img = icon.getImage();
-				  Image newimg = img.getScaledInstance(100, 100,  java.awt.Image.SCALE_SMOOTH);
-				  icon = new ImageIcon(newimg);
-					picLabel.setIcon(icon);
-				try {
-					Encrypt_in_image en = new Encrypt_in_image(file.getPath(), "gfjhgj");
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+				String ciphertext = jtf_ciphertext.getText();
+				if(ciphertext.compareTo("") == 0)
+				{
+					JOptionPane.showMessageDialog(null, "You have to first encrypt text");
 				}
-				
+				else
+				{
+					JFileChooser fileChooser = new JFileChooser("D:\\");
+					if (fileChooser.showOpenDialog(open_file) == JFileChooser.APPROVE_OPTION) {
+					  File file = fileChooser.getSelectedFile();
+					  ImageIcon icon = new ImageIcon(file.getPath());
+					  Image img = icon.getImage();
+					  Image newimg = img.getScaledInstance(100, 100,  java.awt.Image.SCALE_SMOOTH);
+					  icon = new ImageIcon(newimg);
+						picLabel.setIcon(icon);
+					try {
+						Encrypt_in_image en = new Encrypt_in_image(file.getPath(), ciphertext);
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
+					}
 				}
 			}
 		});
 		
-			textArea.setSize(100,100);  
-		    textArea.setEditable(false);
-		    textArea.setVisible(true);
-		    JScrollPane scroll = new JScrollPane (textArea);
-		    scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-		          scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-		       
+			//textArea.setSize(100,100);  
+		  //  textArea.setEditable(false);
+		    //textArea.setVisible(true);
+		//    JScrollPane scroll = new JScrollPane (textArea);
+	//	    scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+		   //       scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
 		//First row
 		gbc.gridx = 0;
 		gbc.gridy = 0;
-		panel.add(str_plaintext, gbc);
+		panel.add(str_plaintext, gbc); //
 		
 		gbc.gridx = 1;
 		gbc.gridy = 0;
@@ -195,9 +206,9 @@ public class Encryption  {
 		gbc.gridy = 4;
 		panel.add(open_file, gbc);
 		
-		gbc.gridx = 1;
-		gbc.gridy = 4;
-		panel.add(textArea, gbc);
+		//gbc.gridx = 1;
+		//gbc.gridy = 4;
+		//panel.add(textArea, gbc);
 		//////////
 
 			gbc.gridx = 1;
@@ -209,6 +220,11 @@ public class Encryption  {
 		gbc.gridx = 0;
 		gbc.gridy = 5;
 		panel.add(btn_encrypt_image, gbc);
+		
+		gbc.gridx = 0;
+		gbc.gridy = 6;
+		panel.add(btn_open_image, gbc);
+		
 		   jfrm.add(panel);
 		jfrm.setLocation(300, 150);
 		jfrm.setVisible(true);
