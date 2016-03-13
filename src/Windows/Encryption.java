@@ -15,7 +15,9 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
@@ -30,8 +32,7 @@ public class Encryption {
 	private JTextField jtf_plaintext ;
 	private JTextField jtf_key ;
 	private JTextField jtf_ciphertext ;
-	private DefaultTableModel model = new DefaultTableModel(); 
-	private JTable table = new JTable(model); 
+	private JTextArea textArea = new JTextArea (5, 20);
 	private JButton open_file = new JButton("Open file to decrypt");
 	  GridBagConstraints gbc ;
 	 Encryption()
@@ -43,8 +44,6 @@ public class Encryption {
 	    gbc.anchor = GridBagConstraints.NORTHWEST;
 	  // gbc.gridwidth = GridBagConstraints.REMAINDER;
 	    
-	   
-	   
 	    JFrame jfrm = new JFrame("Encryption");
 		   jfrm.setSize(720, 400);
 		   jfrm.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -54,14 +53,9 @@ public class Encryption {
 		   jtf_ciphertext = new JTextField(28);
 		jtf_key.setText("Thats my Kung Fu");
 		jtf_plaintext.setText("Two One Nine Two");
-		JLabel jlab = new JLabel("message");
+		JLabel jlab = new JLabel("_________");
 		JButton jbtn1 = new JButton("Encrypt");
 		JButton jbtn2 = new JButton("Decrypt");
-		// Create a couple of columns 
-		model.addColumn("Col1"); 
-		model.addColumn("Col2"); 
-		model.addColumn("Col3"); 
-		model.addColumn("Col4"); 
 		jbtn1.addActionListener(new ActionListener()
 			{
 				@Override
@@ -72,11 +66,6 @@ public class Encryption {
 					byte[][] r = a.get_ciphertext();
 					
 					System.out.println("From main class123");
-					// Append a row 
-					/*StringBuffer strBuffer1 = new StringBuffer();
-					StringBuffer strBuffer2 = new StringBuffer();
-					StringBuffer strBuffer3 = new StringBuffer();
-					StringBuffer strBuffer4 = new StringBuffer();*/
 					String cipher_text = "";
 					for(int j = 0; j < 4; j++)
 					{
@@ -86,27 +75,6 @@ public class Encryption {
 						}
 					}
 					jtf_ciphertext.setText(cipher_text);
-					for(int i = 0; i < 4; i++)
-					{
-					/*	strBuffer1.setLength(0);
-						strBuffer2.setLength(0);
-						strBuffer3.setLength(0);
-						strBuffer4.setLength(0);
-						
-						strBuffer1.append(Long.toHexString(r[i][0]).toUpperCase());
-						strBuffer2.append(Long.toHexString(r[i][1]).toUpperCase());
-						strBuffer3.append(Long.toHexString(r[i][2]).toUpperCase());
-						strBuffer4.append(Long.toHexString(r[i][3]).toUpperCase());*/
-						
-						model.addRow(new Object[]{Integer.toString(r[i][0]), Integer.toString(r[i][1]),
-								Integer.toString(r[i][2]), Integer.toString(r[i][3]) });
-						
-						/*strBuffer1.setLength(0);
-						strBuffer2.setLength(0);
-						strBuffer3.setLength(0);
-						strBuffer4.setLength(0);*/
-						
-					}
 				}
 			});
 		jbtn2.addActionListener(new ActionListener() 
@@ -130,17 +98,22 @@ public class Encryption {
 		{
 			public void actionPerformed(ActionEvent arg0) {
 				JFileChooser fileChooser = new JFileChooser("D:\\");
-				//fileChooser.setCurrentDirectory("D:/");
 				if (fileChooser.showOpenDialog(open_file) == JFileChooser.APPROVE_OPTION) {
 				  File file = fileChooser.getSelectedFile();
 				 String plain_text = read_file(file.getPath());
-				 Decrypt d = new Decrypt(plain_text, jtf_key.getText());
-					String source_text = d.get_text();
-					jlab.setText(source_text);
+				 jtf_ciphertext.setText(plain_text);
+				 textArea.setText(plain_text);
 				}
 			}
 			
 		});
+		 textArea.setSize(100,100);  
+		    textArea.setEditable(false);
+		    textArea.setVisible(true);
+		    JScrollPane scroll = new JScrollPane (textArea);
+		    scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+		          scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+
 		//First row
 		gbc.gridx = 0;
 		gbc.gridy = 0;
@@ -182,13 +155,13 @@ public class Encryption {
 		gbc.gridy = 0;
 		panel.add(jlab, gbc);
 		
-		gbc.gridx = 1;
-		gbc.gridy = 4;
-		panel.add(table, gbc);
-		
 		gbc.gridx = 0;
 		gbc.gridy = 4;
 		panel.add(open_file, gbc);
+		
+		gbc.gridx = 1;
+		gbc.gridy = 4;
+		panel.add(textArea, gbc);
 		   jfrm.add(panel);
 		jfrm.setVisible(true);
 	}
