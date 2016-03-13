@@ -26,8 +26,10 @@ import AES.Encrypt;
 public class Encryption {
 	private JLabel str_key = new JLabel("Key");
 	private JLabel str_plaintext = new JLabel("Plaintext");
+	private JLabel str_ciphertext = new JLabel("Ciphertext");
 	private JTextField jtf_plaintext ;
 	private JTextField jtf_key ;
+	private JTextField jtf_ciphertext ;
 	private DefaultTableModel model = new DefaultTableModel(); 
 	private JTable table = new JTable(model); 
 	private JButton open_file = new JButton("Open file to decrypt");
@@ -49,6 +51,7 @@ public class Encryption {
 
 		   jtf_key = new JTextField(12);
 		   jtf_plaintext = new JTextField(12);
+		   jtf_ciphertext = new JTextField(28);
 		jtf_key.setText("Thats my Kung Fu");
 		jtf_plaintext.setText("Two One Nine Two");
 		JLabel jlab = new JLabel("message");
@@ -74,6 +77,15 @@ public class Encryption {
 					StringBuffer strBuffer2 = new StringBuffer();
 					StringBuffer strBuffer3 = new StringBuffer();
 					StringBuffer strBuffer4 = new StringBuffer();*/
+					String cipher_text = "";
+					for(int j = 0; j < 4; j++)
+					{
+						for(int i = 0; i < 4; i++)
+						{
+							cipher_text = cipher_text + r[i][j] + " ";
+						}
+					}
+					jtf_ciphertext.setText(cipher_text);
 					for(int i = 0; i < 4; i++)
 					{
 					/*	strBuffer1.setLength(0);
@@ -88,27 +100,26 @@ public class Encryption {
 						
 						model.addRow(new Object[]{Integer.toString(r[i][0]), Integer.toString(r[i][1]),
 								Integer.toString(r[i][2]), Integer.toString(r[i][3]) });
+						
 						/*strBuffer1.setLength(0);
 						strBuffer2.setLength(0);
 						strBuffer3.setLength(0);
 						strBuffer4.setLength(0);*/
 						
 					}
-					jlab.setText(str_key);
-					
 				}
 			});
 		jbtn2.addActionListener(new ActionListener() 
 		{
 			public void actionPerformed(ActionEvent e) {
-				String plain_text = "";
-				for(int j = 0; j < 4; j++) //first - rows
+				String plain_text = jtf_ciphertext.getText();
+			/*	for(int j = 0; j < 4; j++) //first - rows
 				{
 					for(int i = 0; i < 4; i++)
 					{
 						plain_text = plain_text + (String) table.getModel().getValueAt(i, j) + " ";
 					}
-				}
+				}*/
 				Decrypt d = new Decrypt(plain_text, jtf_key.getText());
 				String source_text = d.get_text();
 				jlab.setText(source_text);
@@ -130,29 +141,41 @@ public class Encryption {
 			}
 			
 		});
+		//First row
 		gbc.gridx = 0;
 		gbc.gridy = 0;
 		panel.add(str_plaintext, gbc);
-		
-		gbc.gridx = 0;
-		gbc.gridy = 1;
-		panel.add(str_key, gbc);
 		
 		gbc.gridx = 1;
 		gbc.gridy = 0;
 		panel.add(jtf_plaintext, gbc);
 		
+		//Second row
+		gbc.gridx = 0;
+		gbc.gridy = 1;
+		panel.add(str_key, gbc);
 		gbc.gridx = 1;
 		gbc.gridy = 1;
 		panel.add(jtf_key, gbc);
 		
+		//3
 		gbc.gridx = 0;
-		gbc.gridy =  2;
+		gbc.gridy = 2;
+		panel.add(str_ciphertext, gbc);
+		
+		gbc.gridx = 1;
+		gbc.gridy = 2;
+		panel.add(jtf_ciphertext, gbc);
+		
+		//4
+		
+		gbc.gridx = 0;
+		gbc.gridy =  3;
 		gbc.ipady = 10;
 		gbc.ipadx = 10;
 		panel.add(jbtn1, gbc);
 		gbc.gridx = 1;
-		gbc.gridy = 2;
+		gbc.gridy = 3;
 		panel.add(jbtn2, gbc);
 		
 		gbc.gridx = 2;
@@ -160,7 +183,7 @@ public class Encryption {
 		panel.add(jlab, gbc);
 		
 		gbc.gridx = 1;
-		gbc.gridy = 3;
+		gbc.gridy = 4;
 		panel.add(table, gbc);
 		
 		gbc.gridx = 0;
