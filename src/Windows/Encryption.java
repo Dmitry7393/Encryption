@@ -1,7 +1,5 @@
 package Windows;
 
-import java.awt.BorderLayout;
-import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -12,12 +10,18 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.table.DefaultTableModel;
+
+import AES.Encrypt;
 
 public class Encryption {
 	private JLabel str_key = new JLabel("Key");
-	private JTextField jtf;
+	private JTextField jtf ;
+	private DefaultTableModel model = new DefaultTableModel(); 
+	private JTable table = new JTable(model); 
 	  GridBagConstraints gbc ;
 	  
 	 Encryption()
@@ -36,16 +40,33 @@ public class Encryption {
 		   jfrm.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		jtf = new JTextField(12);
+		jtf.setText("Thats my Kung Fu");
 		JLabel jlab = new JLabel("message");
 		JButton jbtn1 = new JButton("Encrypt");
 		JButton jbtn2 = new JButton("Decrypt");
-		
+		// Create a couple of columns 
+		model.addColumn("Col1"); 
+		model.addColumn("Col2"); 
+		model.addColumn("Col3"); 
+		model.addColumn("Col4"); 
 		jbtn1.addActionListener(new ActionListener()
 			{
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
-					String str = jtf.getText();
-					jlab.setText(str);
+					
+					String str_plain_text = "Two One Nine Two";
+					String str_key = jtf.getText();
+					Encrypt a = new Encrypt(str_plain_text, str_key);
+					byte[][] r = a.get_ciphertext();
+					
+					System.out.println("From main class123");
+					// Append a row 
+					for(int i = 0; i < 4; i++)
+					{
+						model.addRow(new Object[]{Byte.toString(r[i][0]), Integer.toString((r[i][1])),
+								Byte.toString(r[i][2]), Integer.toString((r[i][3])) });
+					}
+					jlab.setText(str_key);
 					
 				}
 			});
@@ -80,6 +101,10 @@ public class Encryption {
 		gbc.gridx = 1;
 		gbc.gridy = 2;
 		panel.add(jlab, gbc);
+		
+		gbc.gridx = 1;
+		gbc.gridy = 3;
+		panel.add(table, gbc);
 		   jfrm.add(panel);
 		jfrm.setVisible(true);
 	}
