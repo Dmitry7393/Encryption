@@ -31,6 +31,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import AES.Decrypt;
 import AES.Encrypt;
+import Image.Decrypt_image;
 import Image.Encrypt_in_image;
 
 public class Encryption  {
@@ -38,6 +39,7 @@ public class Encryption  {
 	private JButton btn_decrypt = new JButton("Decrypt");
 	private JButton btn_encrypt_image = new JButton("Save to image");
 	private JButton btn_open_image = new JButton("Open original");
+	private JButton btn_decrypt_images = new JButton("Decrypt images");
 	private JLabel str_key = new JLabel("Key");
 	private JLabel str_plaintext = new JLabel("Plaintext");
 	private JLabel str_ciphertext = new JLabel("Ciphertext");
@@ -47,11 +49,12 @@ public class Encryption  {
 	//private JTextArea textArea = new JTextArea (5, 5);
 	private JButton open_file = new JButton("Open file to decrypt");
 	private GridBagConstraints gbc ;
-	private  JLabel picLabel = new JLabel();
+	private  JLabel picLabel_original = new JLabel();
+	private  JLabel picLabel_decrypted = new JLabel();
 	private Image image_original;
 	private JTabbedPane  tab = new JTabbedPane();
-	Boolean show_image = false;
-
+	private String path_picture_original = "";
+	private String path_picture_decrypted = "";
 	 Encryption() throws IOException 
 	{
 		 
@@ -125,6 +128,22 @@ public class Encryption  {
 				}
 			}
 		});
+		
+		btn_open_image.addActionListener(new ActionListener()  //Just open image
+		{
+			public void actionPerformed(ActionEvent arg0) {
+				JFileChooser fileChooser = new JFileChooser("D:\\");
+				if (fileChooser.showOpenDialog(open_file) == JFileChooser.APPROVE_OPTION) {
+				  File file = fileChooser.getSelectedFile();
+				  path_picture_original = file.getPath();
+				  ImageIcon icon = new ImageIcon(file.getPath());
+				  Image img = icon.getImage();
+				  Image newimg = img.getScaledInstance(100, 100,  java.awt.Image.SCALE_SMOOTH);
+				  icon = new ImageIcon(newimg);
+				  picLabel_original.setIcon(icon);
+					}
+			}
+		});
 		btn_encrypt_image.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent arg0) {
@@ -135,23 +154,55 @@ public class Encryption  {
 				}
 				else
 				{
+					if(path_picture_original.compareTo("") == 0)
+					{
+						JOptionPane.showMessageDialog(null, "Upload image!");
+					}
+					else
+					{
+						try 
+						{
+							Encrypt_in_image en = new Encrypt_in_image(path_picture_original, ciphertext);
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					}
+					
+				}
+			}
+		});
+		btn_decrypt_images.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent arg0) {
+				if(path_picture_original.compareTo("") == 0)
+				{
+					JOptionPane.showMessageDialog(null, "Upload the original image");
+				}
+				else
+				{
+					String cf = "";
 					JFileChooser fileChooser = new JFileChooser("D:\\");
 					if (fileChooser.showOpenDialog(open_file) == JFileChooser.APPROVE_OPTION) {
 					  File file = fileChooser.getSelectedFile();
+					  path_picture_decrypted = file.getPath();
+					  System.out.println("path_picture_decrypted " + path_picture_decrypted);
 					  ImageIcon icon = new ImageIcon(file.getPath());
 					  Image img = icon.getImage();
 					  Image newimg = img.getScaledInstance(100, 100,  java.awt.Image.SCALE_SMOOTH);
 					  icon = new ImageIcon(newimg);
-						picLabel.setIcon(icon);
-					try {
-						Encrypt_in_image en = new Encrypt_in_image(file.getPath(), ciphertext);
+					  picLabel_decrypted.setIcon(icon);
+					  
+					  Decrypt_image dc = new Decrypt_image();
+					  try {
+						 cf = dc.get_text(path_picture_original, path_picture_decrypted);
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-					
+					  jtf_ciphertext.setText(cf);
 					}
 				}
+				
 			}
 		});
 		
@@ -191,8 +242,8 @@ public class Encryption  {
 		
 		gbc.gridx = 0;
 		gbc.gridy =  3;
-		gbc.ipady = 10;
-		gbc.ipadx = 10;
+		//gbc.ipady = 10;
+		//gbc.ipadx = 10;
 		panel.add(btn_encrypt, gbc);
 		gbc.gridx = 1;
 		gbc.gridy = 3;
@@ -213,20 +264,27 @@ public class Encryption  {
 
 			gbc.gridx = 1;
 			gbc.gridy = 5;
-			panel.add(picLabel, gbc);
+			panel.add(picLabel_original, gbc);
 	
 
 		
 		gbc.gridx = 0;
 		gbc.gridy = 5;
-		panel.add(btn_encrypt_image, gbc);
+		panel.add(btn_open_image, gbc);
 		
 		gbc.gridx = 0;
 		gbc.gridy = 6;
-		panel.add(btn_open_image, gbc);
+		panel.add(btn_encrypt_image, gbc); 
 		
+		gbc.gridx = 1;
+		gbc.gridy = 6;
+		panel.add(btn_decrypt_images, gbc);
+		
+		gbc.gridx = 2;
+		gbc.gridy = 5;
+		panel.add(picLabel_decrypted, gbc);
 		   jfrm.add(panel);
-		jfrm.setLocation(300, 150);
+		jfrm.setLocation(100, 100);
 		jfrm.setVisible(true);
 	}
 	public static void main(String[] args) {
