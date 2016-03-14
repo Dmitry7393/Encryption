@@ -1,22 +1,15 @@
 package Windows;
 
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-
-import javax.imageio.ImageIO;
-import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -24,9 +17,6 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import AES.Decrypt;
@@ -51,8 +41,7 @@ public class Encryption  {
 	private GridBagConstraints gbc ;
 	private  JLabel picLabel_original = new JLabel();
 	private  JLabel picLabel_decrypted = new JLabel();
-	private Image image_original;
-	private JTabbedPane  tab = new JTabbedPane();
+	//private JTabbedPane  tab = new JTabbedPane();
 	private String path_picture_original = "";
 	private String path_picture_decrypted = "";
 	 Encryption() throws IOException 
@@ -83,8 +72,6 @@ public class Encryption  {
 		jtf_key.setText("Thats my Kung Fu");
 		jtf_plaintext.setText("Two One Nine Two");
 		JLabel jlab = new JLabel("_________");
-		 ImageIcon ii = new ImageIcon("D:/rrr.png");
-		 image_original = ii.getImage();
 		btn_encrypt.addActionListener(new ActionListener()
 			{
 				@Override
@@ -196,7 +183,6 @@ public class Encryption  {
 					  try {
 						 cf = dc.get_text(path_picture_original, path_picture_decrypted);
 					} catch (IOException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 					  jtf_ciphertext.setText(cf);
