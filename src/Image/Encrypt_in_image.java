@@ -15,9 +15,8 @@ public class Encrypt_in_image {
 	}
 	private int[] get_ciphertext(String source_string)
 	{
-		int[] s = new int[16];
 		String[] arr = source_string.split(" ");
-		System.out.println("source_stringd " + source_string);
+		int[] s = new int[arr.length];
 		for (int i = 0; i < arr.length; i++)
 		{
 			s[i] = Integer.parseInt(arr[i]) ;

@@ -1,39 +1,25 @@
 package AES;
 
 public class Decrypt extends AES {
-	String source_text =  "";
-	private byte[][] get_plain_text(String source_string)
-	{
-		byte[][] s = new byte[4][4];
-		String[] arr = source_string.split(" ");
-		
-		System.out.println("source_stringd " + source_string);
-		int i1 = 0; int j1 = 0 ;
-		for (int i = 0; i < arr.length; i++)
-		{
-			System.out.println("arr: " + arr[i]);
-			s[i1][j1] = (byte) Integer.parseInt( arr[i]) ;
-			i1++;
-			if(i1 == 4)
-			{
-				i1 = 0;
-				j1++;
-			}
-		}
-		return s;
-	}
+	private String source_text =  "";
 	public String get_text()
 	{
 		return source_text;
 	}
-	public Decrypt(String str_plain_text, String str_key)
+	private String Decrypt_block(byte[][] block_16, String str_key)
 	{
 		byte plain_text[][] = new byte[4][4];
 		byte cipher[][] = new byte[4][4];
 		byte Round[][][] = new byte[11][4][4];
 		
-		plain_text = get_plain_text(str_plain_text);
-	
+		for(int i = 0; i < 4; i++)
+		{
+			for(int j = 0; j < 4; j++)
+			{
+				plain_text[i] = block_16[i];
+			}
+		}
+		
 		show(plain_text);
 		cipher = toHex(str_key);
 		for(int i = 0; i < 4; i++)
@@ -62,5 +48,39 @@ public class Decrypt extends AES {
 		show(plain_text);
 		source_text = hex_to_string(plain_text);
 		System.out.println("decrypted text: "  + source_text);
+		return source_text;
+	}
+	public Decrypt(String str_plain_text, String str_key)
+	{
+		String[] arr = str_plain_text.split(" ");
+		int[] cipher_code = new int[arr.length];
+		for(int i = 0; i < arr.length; i++)
+		{
+			cipher_code[i] = Integer.parseInt(arr[i]);
+		}
+		source_text = "";
+		byte[][] temp_block = new byte[4][4];
+		for(int i = 0; i < arr.length; i += 16)
+		{
+			temp_block = get_block(cipher_code, i, i+16);
+			source_text = source_text + Decrypt_block(temp_block, str_key);	
+		}
+	}
+	private byte[][] get_block(int[] cipher_code, int index1, int index2)
+	{
+		byte[][] tmp = new byte[4][4];
+		int i1 = 0; int j1 = 0 ;
+		for(int i = index1; i < index2; i++)
+		{
+			//System.out.println("cipher_code: "  + cipher_code[i]);
+			tmp[i1][j1] = (byte) cipher_code[i];
+			i1++;
+			if(i1 == 4)
+			{
+				i1 = 0;
+				j1++;
+			}
+		}
+		return tmp;
 	}
 }

@@ -1,18 +1,10 @@
 package AES;
 
 public class Encrypt extends AES {
-	private byte[][] result = new byte[4][4];
-	private void set_result(byte[][] plain_text)
+	private String whole_ciphertext = "";
+	
+	private String Encrypt_block(String str_plain_text, String str_key)
 	{
-		for(int i = 0; i < 4; i++)
-		{
-			for(int j = 0; j < 4; j++)
-			{
-				result[i][j] = plain_text[i][j];
-			}
-		}
-	}
-	public Encrypt(String str_plain_text, String str_key) {
 		byte plain_text[][] = new byte[4][4];
 		byte cipher[][] = new byte[4][4];
 		byte Round[][][] = new byte[11][4][4];
@@ -49,12 +41,37 @@ public class Encrypt extends AES {
 		
 		System.out.println("Ciphertext: ");
 		show(plain_text);
-		set_result(plain_text);
 		write_to_file(plain_text, "D:/ciphertext.txt");
+		
+		String cipher_text = "";
+		for(int j = 0; j < 4; j++)
+		{
+			for(int i = 0; i < 4; i++)
+			{
+				cipher_text = cipher_text + plain_text[i][j] + " ";
+			}
+		}
+		return cipher_text;
 	}
-	public byte[][] get_ciphertext()
+	public Encrypt(String str_plain_text, String str_key) {
+		int r = 0;
+		whole_ciphertext = "";
+		for(int i = 0; i < str_plain_text.length(); i += 16)
+		{
+			r = str_plain_text.length() - i;
+			if(r >= 16)
+			{
+				whole_ciphertext = whole_ciphertext + Encrypt_block(str_plain_text.substring(i, i+16), str_key);
+			}
+			else
+			{
+				whole_ciphertext = whole_ciphertext + Encrypt_block(str_plain_text.substring(i, i+r), str_key);
+			}
+		}
+	}
+	public String get_ciphertext()
 	{
-		return result;
+		return whole_ciphertext;
 	}
 
 }

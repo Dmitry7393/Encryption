@@ -63,12 +63,12 @@ public class Encryption  {
 	  // gbc.gridwidth = GridBagConstraints.REMAINDER;
 	    
 	    JFrame jfrm = new JFrame("Encryption");
-		   jfrm.setSize(720, 500);
+		   jfrm.setSize(920, 500);
 		   jfrm.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		   jtf_key = new JTextField(12);
-		   jtf_plaintext = new JTextField(12);
-		   jtf_ciphertext = new JTextField(12);
+		   jtf_key = new JTextField(20);
+		   jtf_plaintext = new JTextField(20);
+		   jtf_ciphertext = new JTextField(20);
 		jtf_key.setText("Thats my Kung Fu");
 		jtf_plaintext.setText("Two One Nine Two");
 		JLabel jlab = new JLabel("_________");
@@ -79,17 +79,7 @@ public class Encryption  {
 					String str_plain_text = jtf_plaintext.getText();
 					String str_key = jtf_key.getText();
 					Encrypt a = new Encrypt(str_plain_text, str_key);
-					byte[][] r = a.get_ciphertext();
-					
-					System.out.println("From main class123");
-					String cipher_text = "";
-					for(int j = 0; j < 4; j++)
-					{
-						for(int i = 0; i < 4; i++)
-						{
-							cipher_text = cipher_text + r[i][j] + " ";
-						}
-					}
+					String cipher_text = a.get_ciphertext();
 					jtf_ciphertext.setText(cipher_text);
 				}
 			});
@@ -281,7 +271,6 @@ public class Encryption  {
 				try {
 					new Encryption();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
