@@ -1,2 +1,2 @@
 # Encryption
-![Alt text](/relative/path/to/img.jpg?raw=true "Optional Title")
+![Alt text](/screenshot/img.jpg?raw=true "Optional Title")
