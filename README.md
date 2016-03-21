@@ -7,6 +7,6 @@ My application:
 
 ## UI Mistakes:
 
-Different languages
-Different distance between controls
-Different size of images
+Different languages <br />
+Different distance between controls <br />
+Different size of images 
