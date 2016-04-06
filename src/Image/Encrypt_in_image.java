@@ -73,7 +73,7 @@ public class Encrypt_in_image {
 		}
 		return true;
 	}
-	public Encrypt_in_image(String path, String str_ciphertext) throws IOException
+	public void EncryptInImage(String path, String str_ciphertext) throws IOException
 	{
 		BufferedImage img = ImageIO.read(new File(path)); 
 		
@@ -156,6 +156,8 @@ public class Encrypt_in_image {
   			  ImageIO.write(img, "png", outputfile);
         }
 		  }
+	}
+	public Encrypt_in_image() {
 	}
 	//sorting by y
 	 private  void Sort_y(Points point[], int start, int end) {

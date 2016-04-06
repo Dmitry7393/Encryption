@@ -11,7 +11,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
-import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -82,8 +81,9 @@ public class Encryption  {
 				public void actionPerformed(ActionEvent arg0) {
 					String str_plain_text = jtf_plaintext.getText();
 					String str_key = jtf_key.getText();
-					Encrypt a = new Encrypt(str_plain_text, str_key);
-					String cipher_text = a.get_ciphertext();
+					Encrypt encrText = new Encrypt();
+					encrText.EncryptText(str_plain_text, str_key);
+					String cipher_text = encrText.get_ciphertext();
 					jtf_ciphertext.setText(cipher_text);
 				}
 			});
@@ -91,7 +91,8 @@ public class Encryption  {
 		{
 			public void actionPerformed(ActionEvent e) {
 				String plain_text = jtf_ciphertext.getText();
-				Decrypt d = new Decrypt(plain_text, jtf_key.getText());
+				Decrypt d = new Decrypt();
+				d.DecryptText(plain_text, jtf_key.getText());
 				String source_text = d.get_text();
 				jlab.setText(source_text);
 				
@@ -143,7 +144,8 @@ public class Encryption  {
 					{
 						try 
 						{
-							Encrypt_in_image en = new Encrypt_in_image(path_picture_original, ciphertext);
+							Encrypt_in_image en = new Encrypt_in_image();
+							en.EncryptInImage(path_picture_original, ciphertext);
 						} catch (IOException e) {
 							e.printStackTrace();
 						}
@@ -201,7 +203,9 @@ public class Encryption  {
 				        }
 					  try
 					  {
-						  Encrypt encryptFile = new Encrypt(jtf_key.getText(), sourceFile, resultFilePath);
+						  Encrypt encryptFile = new Encrypt();
+						  encryptFile.EncryptFile(jtf_key.getText(), sourceFile, resultFilePath);
+						  
 					  }
 					  catch(NullPointerException e){ 
 						  System.out.println("NullPointerException: " + e);
@@ -225,7 +229,8 @@ public class Encryption  {
 			        }
 				  try
 				  {
-					  Decrypt decryptFile = new Decrypt(jtf_key.getText(), sourceFile, resultFilePath);
+					  Decrypt decryptFile = new Decrypt();
+					  decryptFile.DecryptFile(jtf_key.getText(), sourceFile, resultFilePath);
 				  }
 				  catch(NullPointerException e){ 
 					  System.out.println("NullPointerException: " + e);
