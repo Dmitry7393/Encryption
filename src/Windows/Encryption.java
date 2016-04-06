@@ -81,7 +81,7 @@ public class Encryption  {
 				public void actionPerformed(ActionEvent arg0) {
 					String str_plain_text = jtf_plaintext.getText();
 					String str_key = jtf_key.getText();
-					Encrypt encrText = new Encrypt();
+					Encrypt encrText = new Encrypt(str_key);
 					encrText.EncryptText(str_plain_text, str_key);
 					String cipher_text = encrText.get_ciphertext();
 					jtf_ciphertext.setText(cipher_text);
@@ -90,11 +90,18 @@ public class Encryption  {
 		btn_decrypt.addActionListener(new ActionListener() 
 		{
 			public void actionPerformed(ActionEvent e) {
-				String plain_text = jtf_ciphertext.getText();
-				Decrypt d = new Decrypt();
-				d.DecryptText(plain_text, jtf_key.getText());
-				String source_text = d.get_text();
-				jlab.setText(source_text);
+				if(jtf_ciphertext.getText().equals(""))
+				{
+					JOptionPane.showMessageDialog(null, "Enter ciphertext first!");
+				}
+				else
+				{
+					String plain_text = jtf_ciphertext.getText();
+					Decrypt d = new Decrypt(jtf_key.getText());
+					d.DecryptText(plain_text, jtf_key.getText());
+					String source_text = d.get_text();
+					jlab.setText(source_text);
+				}
 				
 			}
 		});
@@ -203,7 +210,7 @@ public class Encryption  {
 				        }
 					  try
 					  {
-						  Encrypt encryptFile = new Encrypt();
+						  Encrypt encryptFile = new Encrypt(jtf_key.getText());
 						  encryptFile.EncryptFile(jtf_key.getText(), sourceFile, resultFilePath);
 						  
 					  }
@@ -229,7 +236,7 @@ public class Encryption  {
 			        }
 				  try
 				  {
-					  Decrypt decryptFile = new Decrypt();
+					  Decrypt decryptFile = new Decrypt(jtf_key.getText());
 					  decryptFile.DecryptFile(jtf_key.getText(), sourceFile, resultFilePath);
 				  }
 				  catch(NullPointerException e){ 

@@ -8,25 +8,14 @@ import java.io.InputStream;
 
 public class Decrypt extends AES {
 	private String source_text =  "";
+	private  byte Round[][][] = new byte[11][4][4];
 	public String get_text()
 	{
 		return source_text;
 	}
-	private byte[] Decrypt_block(byte[][] block_16, String str_key, String typeDecryption)
+	private void initRoundKey(String str_key)
 	{
-		byte plain_text[][] = new byte[4][4];
 		byte cipher[][] = new byte[4][4];
-		byte Round[][][] = new byte[11][4][4];
-		
-		for(int i = 0; i < 4; i++)
-		{
-			for(int j = 0; j < 4; j++)
-			{
-				plain_text[i] = block_16[i];
-			}
-		}
-		
-		show(plain_text);
 		cipher = toHex(str_key);
 		for(int i = 0; i < 4; i++)
 		{
@@ -39,7 +28,18 @@ public class Decrypt extends AES {
 		{
 			Round[i] = get_cipher(cipher, RC[i-1]);
 		}
-		System.out.println("\n      Decryption: ");
+	}
+	private byte[] Decrypt_block(byte[][] block_16, String str_key, String typeDecryption)
+	{
+		byte plain_text[][] = new byte[4][4];
+		for(int i = 0; i < 4; i++)
+		{
+			for(int j = 0; j < 4; j++)
+			{
+				plain_text[i] = block_16[i];
+			}
+		}
+		//show(plain_text);
 		XOR(plain_text, Round[10]);
 		ShiftRows(plain_text, true);
 		SubBytes(plain_text, true);
@@ -51,7 +51,7 @@ public class Decrypt extends AES {
 			SubBytes(plain_text, true);
 		}
 		XOR(plain_text, Round[0]); 
-		show(plain_text);
+		//show(plain_text);
 		if(typeDecryption.equals("string"))
 		{
 			source_text += hex_to_string(plain_text);
@@ -95,8 +95,8 @@ public class Decrypt extends AES {
 			
 		}
 	}
-	public Decrypt(){
-		
+	public Decrypt(String key){
+		initRoundKey(key);
 	}
     public  void convertToHex(String key, File file, String pathNew) throws IOException {
 		InputStream is = new FileInputStream(file);
@@ -113,7 +113,7 @@ public class Decrypt extends AES {
 		    if(bytesCounter==15) {
 		    	tempBytes = getBlock4_4(currentBytes, 16);
 		    	decryptedBytes = Decrypt_block(tempBytes, key, "file");
-		       	WriteFile(fos, decryptedBytes, 16, false);
+		       	WriteFile(fos, decryptedBytes, 16);
 		       	bytesCounter=0;
 		       	j = 0;
 		       	for(int i = 0; i < 16; i++)
@@ -131,18 +131,17 @@ public class Decrypt extends AES {
 		{		
 			tempBytes = getBlock4_4(currentBytes, 16);
 			decryptedBytes = Decrypt_block(tempBytes, key, "file");
-		  	WriteFile(fos, decryptedBytes, j, true);
+		  	WriteFile(fos, decryptedBytes, j);
 	    }
+		 fos.close();
 	     is.close();
 	  }
-    public static void WriteFile(FileOutputStream fos, byte[] arrayBytes, int length, boolean closeThread) throws IOException
+    public static void WriteFile(FileOutputStream fos, byte[] arrayBytes, int length) throws IOException
   	{
   		for(int i = 0; i < length; i++)
   		{
   			fos.write(arrayBytes[i]);
   		}
-  		if(closeThread)
-  	    	  fos.close();
   	}
 	private byte[][] get_block(int[] cipher_code, int index1, int index2)
 	{
@@ -150,7 +149,6 @@ public class Decrypt extends AES {
 		int i1 = 0; int j1 = 0 ;
 		for(int i = index1; i < index2; i++)
 		{
-			//System.out.println("cipher_code: "  + cipher_code[i]);
 			tmp[i1][j1] = (byte) cipher_code[i];
 			i1++;
 			if(i1 == 4)
