@@ -254,4 +254,21 @@ public class AES {
 			            System.out.println(ex.getMessage());
 			        } 
 		}
+		protected byte[][] getBlock4_4(byte[] block, int size)
+		{
+			byte temp[][] = new byte[4][4];
+		        int i1 = 0;
+		        int j1 = 0;
+		        for(int i = 0; i < size; i++)
+		        {
+		            temp[i1][j1] = block[i];
+		            i1++;
+		            if(i1 == 4)
+		            {
+		                i1 = 0; //new line
+		                j1++; //move to next column
+		            }
+		        }
+		        return temp;
+		}
 }

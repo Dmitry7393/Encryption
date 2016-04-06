@@ -10,6 +10,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+
+import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -30,6 +32,8 @@ public class Encryption  {
 	private JButton btn_encrypt_image = new JButton("Save to image");
 	private JButton btn_open_image = new JButton("Open original");
 	private JButton btn_decrypt_images = new JButton("Decrypt images");
+	private JButton btn_encrypt_file = new JButton("Encrypt file");
+	private JButton btn_decrypt_file = new JButton("Decrypt file");
 	private JLabel str_key = new JLabel("Key");
 	private JLabel str_plaintext = new JLabel("Plaintext");
 	private JLabel str_ciphertext = new JLabel("Ciphertext");
@@ -181,7 +185,54 @@ public class Encryption  {
 				
 			}
 		});
+		btn_encrypt_file.addActionListener(new ActionListener()
+			{
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					File sourceFile = null;
+					String resultFilePath = "";
+					JFileChooser fileChooser = new JFileChooser("D:\\");
+					if (fileChooser.showOpenDialog(open_file) == JFileChooser.APPROVE_OPTION) {
+					   sourceFile = fileChooser.getSelectedFile();
+					}
+					 if (fileChooser.showSaveDialog(fileChooser) == JFileChooser.APPROVE_OPTION) {
+				  		    File file = fileChooser.getSelectedFile();
+				  		  resultFilePath = file.getPath();
+				        }
+					  try
+					  {
+						  Encrypt encryptFile = new Encrypt(jtf_key.getText(), sourceFile, resultFilePath);
+					  }
+					  catch(NullPointerException e){ 
+						  System.out.println("NullPointerException: " + e);
+					  }
+				}
 		
+			});
+		btn_decrypt_file.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				File sourceFile = null;
+				String resultFilePath = "";
+				JFileChooser fileChooser = new JFileChooser("D:\\");
+				if (fileChooser.showOpenDialog(open_file) == JFileChooser.APPROVE_OPTION) {
+				   sourceFile = fileChooser.getSelectedFile();
+				}
+				 if (fileChooser.showSaveDialog(fileChooser) == JFileChooser.APPROVE_OPTION) {
+			  		    File file = fileChooser.getSelectedFile();
+			  		  resultFilePath = file.getPath();
+			        }
+				  try
+				  {
+					  Decrypt decryptFile = new Decrypt(jtf_key.getText(), sourceFile, resultFilePath);
+				  }
+				  catch(NullPointerException e){ 
+					  System.out.println("NullPointerException: " + e);
+				  }
+			}
+	
+		});
 			//textArea.setSize(100,100);  
 		  //  textArea.setEditable(false);
 		    //textArea.setVisible(true);
@@ -259,6 +310,15 @@ public class Encryption  {
 		gbc.gridx = 2;
 		gbc.gridy = 5;
 		panel.add(picLabel_decrypted, gbc);
+		
+		gbc.gridx = 0;
+		gbc.gridy = 7;
+		panel.add(btn_encrypt_file, gbc); 
+		
+		gbc.gridx = 1;
+		gbc.gridy = 7;
+		panel.add(btn_decrypt_file, gbc); 
+		
 		   jfrm.add(panel);
 		jfrm.setLocation(100, 100);
 		jfrm.setVisible(true);
