@@ -36,7 +36,7 @@ public class Decrypt extends AES {
 		{
 			for(int j = 0; j < 4; j++)
 			{
-				plain_text[i] = block_16[i];
+				plain_text[i][j] = block_16[i][j];
 			}
 		}
 		//show(plain_text);
@@ -51,22 +51,23 @@ public class Decrypt extends AES {
 			SubBytes(plain_text, true);
 		}
 		XOR(plain_text, Round[0]); 
+	
 		//show(plain_text);
 		if(typeDecryption.equals("string"))
 		{
 			source_text += hex_to_string(plain_text);
 		}
-		byte result[] = new byte[16];
+		byte decryptedText[] = new byte[16];
 		int k = 0; 
 		for(int j = 0; j < 4; j++)
 		{
 			for(int i = 0; i < 4; i++)
 			{
-				result[k] = plain_text[i][j]; 
+				decryptedText[k] = plain_text[i][j]; 
 				k++;
 			}
 		}
-		return result;
+		return decryptedText;
 	}
 	public void DecryptText(String str_plain_text, String str_key)
 	{
@@ -118,7 +119,7 @@ public class Decrypt extends AES {
 		    if(bytesCounter==15) {
 		    	tempBytes = getBlock4_4(currentBytes, 16);
 		    	decryptedBytes = Decrypt_block(tempBytes, key, "file");
-		       	WriteFile(fos, decryptedBytes, 16);
+		       	WriteFile(fos, decryptedBytes);
 		       	bytesCounter=0;
 		       	j = 0;
 		       	for(int i = 0; i < 16; i++)
@@ -134,16 +135,20 @@ public class Decrypt extends AES {
 		//if still got content - the last a few bytes
 		if(bytesCounter != 0)
 		{		
+			for(int i = 0; i < 16; i++)
+	       	{
+	       		decryptedBytes[i] = 0;
+	       	}
 			tempBytes = getBlock4_4(currentBytes, 16);
 			decryptedBytes = Decrypt_block(tempBytes, key, "file");
-		  	WriteFile(fos, decryptedBytes, j);
+		  	WriteFile(fos, decryptedBytes);
 	    }
 		 fos.close();
 	     is.close();
 	  }
-    public static void WriteFile(FileOutputStream fos, byte[] arrayBytes, int length) throws IOException
+    public static void WriteFile(FileOutputStream fos, byte[] arrayBytes) throws IOException
   	{
-  		for(int i = 0; i < length; i++)
+  		for(int i = 0; i < 16; i++)
   		{
   			fos.write(arrayBytes[i]);
   		}

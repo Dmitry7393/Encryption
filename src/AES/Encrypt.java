@@ -42,7 +42,6 @@ public class Encrypt extends AES {
 		SubBytes(plain_text, false);
 		ShiftRows(plain_text, false);
 		XOR(plain_text, Round[10]);
-		
 		//show(plain_text);
 		//write_to_file(plain_text, "D:/ciphertext.txt");
 		
@@ -117,7 +116,7 @@ public class Encrypt extends AES {
 		    if(bytesCounter==15) {
 		    	block4_4 = getBlock4_4(currentBytes, 16);
 		    	encryptedBytes = Encrypt_block(block4_4, key, "file");
-		       	WriteFile(fos, encryptedBytes, 16);
+		       	WriteFile(fos, encryptedBytes);
 		       	bytesCounter=0;
 		       	j = 0;
 		       	for(int i = 0; i < 16; i++)
@@ -135,14 +134,14 @@ public class Encrypt extends AES {
 		{	
 			block4_4 = getBlock4_4(currentBytes, 16);
 			encryptedBytes = Encrypt_block(block4_4, key, "file");
-		  	WriteFile(fos, encryptedBytes, j);
+		  	WriteFile(fos, encryptedBytes);
 	    }
 			fos.close();
 	        is.close();
 	  }
-  public static void WriteFile(FileOutputStream fos, byte[] arrayBytes, int length) throws IOException
+  public static void WriteFile(FileOutputStream fos, byte[] arrayBytes) throws IOException
 	{
-		for(int i = 0; i < length; i++)
+		for(int i = 0; i < 16; i++)
 		{
 			fos.write(arrayBytes[i]);
 		}
