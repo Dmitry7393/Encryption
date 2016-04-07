@@ -71,17 +71,22 @@ public class Decrypt extends AES {
 	public void DecryptText(String str_plain_text, String str_key)
 	{
 		source_text = "";
-		String[] arr = str_plain_text.split(" ");
-		int[] cipher_code = new int[arr.length];
-		for(int i = 0; i < arr.length; i++)
+		byte byteList[] = Base64ToByte(str_plain_text);
+		byte[][] block16 = new byte[4][4];
+		int r = 0;
+		for(int i = 0; i < byteList.length; i += 16)
 		{
-			cipher_code[i] = Integer.parseInt(arr[i]);
-		}
-		byte[][] temp_block = new byte[4][4];
-		for(int i = 0; i < arr.length; i += 16)
-		{
-			temp_block = get_block(cipher_code, i, i+16);
-		    Decrypt_block(temp_block, str_key, "string");	
+			r = byteList.length - i;
+			if(r >= 16)
+			{
+				block16 = getBlock4_4(byteList, i, i+16);
+				Decrypt_block(block16, str_key, "string");
+			}
+			else
+			{
+				block16 = getBlock4_4(byteList, i, i+r);
+				Decrypt_block(block16, str_key, "string");
+			}
 		}
 	}
 	public void DecryptFile(String key, File sourceFile, String pathOutput)
@@ -143,13 +148,20 @@ public class Decrypt extends AES {
   			fos.write(arrayBytes[i]);
   		}
   	}
-	private byte[][] get_block(int[] cipher_code, int index1, int index2)
+	private byte[][] getBlock4_4(byte[] cipher_code, int index1, int index2)
 	{
 		byte[][] tmp = new byte[4][4];
+		for(int i = 0; i < 4; i++)
+		{
+			for(int j = 0; j < 4; j++)
+			{
+				tmp[i][j] = 0;
+			}
+		}
 		int i1 = 0; int j1 = 0 ;
 		for(int i = index1; i < index2; i++)
 		{
-			tmp[i1][j1] = (byte) cipher_code[i];
+			tmp[i1][j1] = cipher_code[i];
 			i1++;
 			if(i1 == 4)
 			{

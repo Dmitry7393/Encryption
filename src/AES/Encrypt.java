@@ -5,10 +5,12 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 
 public class Encrypt extends AES {
-	private String whole_ciphertext = "";
+	private String cipherTextBase64 = "";
 	private byte Round[][][] = new byte[11][4][4];
+	private ArrayList<Byte> arrayListBytes = new ArrayList<Byte>();
 	private void initRoundKey(String str_key)
 	{
 		byte cipher[][] = new byte[4][4];
@@ -34,7 +36,7 @@ public class Encrypt extends AES {
 			SubBytes(plain_text, false);
 			ShiftRows(plain_text, false);
 			MixColumns(plain_text, false);
-			XOR(plain_text, Round[i]);  
+			XOR(plain_text, Round[i]); 
 		}
 		//AES Round 10 no Mix columns 
 		SubBytes(plain_text, false);
@@ -44,7 +46,7 @@ public class Encrypt extends AES {
 		//show(plain_text);
 		//write_to_file(plain_text, "D:/ciphertext.txt");
 		
-		byte[] ciphertext1 = new byte[16];
+		byte[] ciphertextBytes = new byte[16];
 		if(typeEncryption.equals("file"))
 		{
 			int k = 0; 
@@ -52,29 +54,27 @@ public class Encrypt extends AES {
 			{
 				for(int i = 0; i < 4; i++)
 				{
-					ciphertext1[k] = plain_text[i][j]; 
+					ciphertextBytes[k] = plain_text[i][j]; 
 					k++;
 				}
 			}
 		}
-		if(typeEncryption.equals("string"))
+		if(typeEncryption.equals("string")) //encrypt text
 		{
-			String cipher_text = "";
 	        for(int j = 0; j < 4; j++)
 	        {
 	            for(int i = 0; i < 4; i++)
 	            {
-	                cipher_text = cipher_text + plain_text[i][j] + " ";
+	            	arrayListBytes.add(plain_text[i][j]);
 	            }
-	        }
-			whole_ciphertext += cipher_text;
+	        } 
 		}
-		return ciphertext1;
+		return ciphertextBytes;
 	}
 	public void EncryptText(String str_plain_text, String str_key)
 	{
 		int r = 0;
-		whole_ciphertext = "";
+		cipherTextBase64 = "";
 		for(int i = 0; i < str_plain_text.length(); i += 16)
 		{
 			r = str_plain_text.length() - i;
@@ -147,9 +147,15 @@ public class Encrypt extends AES {
 			fos.write(arrayBytes[i]);
 		}
 	}
-	public String get_ciphertext()
+	public String getCipherText()
 	{
-		return whole_ciphertext;
+		byte tempBytes[] = new byte[arrayListBytes.size()];
+		for(int i = 0; i < arrayListBytes.size(); i++)
+		{
+			tempBytes[i] = arrayListBytes.get(i);
+		}
+		cipherTextBase64 += ConvertToBase64(tempBytes);
+		return cipherTextBase64;
 	}
 
 }

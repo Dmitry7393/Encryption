@@ -1,6 +1,7 @@
 package AES;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Base64;
 
 public class AES {
 	protected static byte RC[] = new byte[]{0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, (byte) 0x80, 0x1b, 0x36 };
@@ -270,5 +271,16 @@ public class AES {
 		            }
 		        }
 		        return temp;
+		}
+		public static String ConvertToBase64(byte myByteArray[])
+		{
+			Base64.Encoder myEncoder = Base64.getEncoder().withoutPadding();
+			String  base64String = myEncoder.encodeToString(myByteArray);
+			return base64String;
+		}
+		public static byte[] Base64ToByte(String myText)
+		{
+			byte[] decoded = Base64.getDecoder().decode(myText);
+			return decoded;
 		}
 }

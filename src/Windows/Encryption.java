@@ -83,7 +83,7 @@ public class Encryption  {
 					String str_key = jtf_key.getText();
 					Encrypt encrText = new Encrypt(str_key);
 					encrText.EncryptText(str_plain_text, str_key);
-					String cipher_text = encrText.get_ciphertext();
+					String cipher_text = encrText.getCipherText();
 					jtf_ciphertext.setText(cipher_text);
 				}
 			});
