@@ -22,14 +22,15 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import AES.Decrypt;
 import AES.Encrypt;
+import Image.DecryptFromImage;
 import Image.EncryptInImage;
 
 public class Encryption  {
 	private JButton btn_encrypt = new JButton("Encrypt");
 	private JButton btn_decrypt = new JButton("Decrypt");
 	private JButton btn_encrypt_image = new JButton("Write ciphertext to image");
-	private JButton btn_open_image = new JButton("Open image");
-	private JButton btn_decrypt_images = new JButton("Decrypt images");
+	private JButton btn_open_image = new JButton("Upload image");
+	private JButton btnGetCiphertextFromImage = new JButton("Get ciphertext from image");
 	private JButton btn_encrypt_file = new JButton("Encrypt file");
 	private JButton btn_decrypt_file = new JButton("Decrypt file");
 	private JLabel str_key = new JLabel("Key");
@@ -45,7 +46,6 @@ public class Encryption  {
 	private  JLabel picLabel_decrypted = new JLabel();
 	//private JTabbedPane  tab = new JTabbedPane();
 	private String path_picture_original = "";
-	private String path_picture_decrypted = "";
 	 Encryption() throws IOException 
 	{
 		 
@@ -160,31 +160,15 @@ public class Encryption  {
 				}
 			}
 		});
-		btn_decrypt_images.addActionListener(new ActionListener()
+		btnGetCiphertextFromImage.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent arg0) {
-				if(path_picture_original.compareTo("") == 0)
-				{
-					JOptionPane.showMessageDialog(null, "Upload the original image");
+				JFileChooser fileChooser = new JFileChooser();
+				if (fileChooser.showOpenDialog(open_file) == JFileChooser.APPROVE_OPTION) {
+				  File file = fileChooser.getSelectedFile();
+				  DecryptFromImage dFrImage = new DecryptFromImage(file.getPath());
+				  jtf_ciphertext.setText(dFrImage.getCiphertext());
 				}
-				else
-				{
-					String cf = "";
-					JFileChooser fileChooser = new JFileChooser("D:\\");
-					if (fileChooser.showOpenDialog(open_file) == JFileChooser.APPROVE_OPTION) {
-					  File file = fileChooser.getSelectedFile();
-					  path_picture_decrypted = file.getPath();
-					  System.out.println("path_picture_decrypted " + path_picture_decrypted);
-					  ImageIcon icon = new ImageIcon(file.getPath());
-					  Image img = icon.getImage();
-					  Image newimg = img.getScaledInstance(100, 100,  java.awt.Image.SCALE_SMOOTH);
-					  icon = new ImageIcon(newimg);
-					  picLabel_decrypted.setIcon(icon);
-					  
-					 jtf_ciphertext.setText(cf);
-					}
-				}
-				
 			}
 		});
 		btn_encrypt_file.addActionListener(new ActionListener()
@@ -311,7 +295,7 @@ public class Encryption  {
 		
 		gbc.gridx = 1;
 		gbc.gridy = 6;
-		panel.add(btn_decrypt_images, gbc);
+		panel.add(btnGetCiphertextFromImage, gbc);
 		
 		gbc.gridx = 2;
 		gbc.gridy = 5;

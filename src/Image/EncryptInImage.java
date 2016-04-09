@@ -73,6 +73,10 @@ public class EncryptInImage {
 	{
 		//Get bytes from stringBase64
 		byte arrayBytes[] = Base64ToByte(stringBase64);
+		for(int i = 0; i < arrayBytes.length; i++)
+		{
+			System.out.print(arrayBytes[i] +" ");
+		}
 		countSourceBytes = arrayBytes.length; 
 		
 		//If we do not have enough pixels to save information
