@@ -22,14 +22,13 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import AES.Decrypt;
 import AES.Encrypt;
-import Image.Decrypt_image;
-import Image.Encrypt_in_image;
+import Image.EncryptInImage;
 
 public class Encryption  {
 	private JButton btn_encrypt = new JButton("Encrypt");
 	private JButton btn_decrypt = new JButton("Decrypt");
-	private JButton btn_encrypt_image = new JButton("Save to image");
-	private JButton btn_open_image = new JButton("Open original");
+	private JButton btn_encrypt_image = new JButton("Write ciphertext to image");
+	private JButton btn_open_image = new JButton("Open image");
 	private JButton btn_decrypt_images = new JButton("Decrypt images");
 	private JButton btn_encrypt_file = new JButton("Encrypt file");
 	private JButton btn_decrypt_file = new JButton("Decrypt file");
@@ -79,6 +78,7 @@ public class Encryption  {
 			{
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
+					
 					String str_plain_text = jtf_plaintext.getText();
 					String str_key = jtf_key.getText();
 					Encrypt encrText = new Encrypt(str_key);
@@ -136,8 +136,8 @@ public class Encryption  {
 		btn_encrypt_image.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent arg0) {
-				String ciphertext = jtf_ciphertext.getText();
-				if(ciphertext.compareTo("") == 0)
+				String ciphertextBase64 = jtf_ciphertext.getText();
+				if(ciphertextBase64.compareTo("") == 0)
 				{
 					JOptionPane.showMessageDialog(null, "You have to first encrypt text");
 				}
@@ -149,12 +149,11 @@ public class Encryption  {
 					}
 					else
 					{
-						try 
-						{
-							Encrypt_in_image en = new Encrypt_in_image();
-							en.EncryptInImage(path_picture_original, ciphertext);
-						} catch (IOException e) {
-							e.printStackTrace();
+						EncryptInImage encryptInImage = new EncryptInImage(path_picture_original);
+						if(encryptInImage.writeBytesToImage(ciphertextBase64) == false){
+							JOptionPane.showMessageDialog(null, "Please, choose more large picture "
+							    + "which has at least " + Integer.toString(encryptInImage.getProperCountPixels())
+							    + " pixels");
 						}
 					}
 					
@@ -182,13 +181,7 @@ public class Encryption  {
 					  icon = new ImageIcon(newimg);
 					  picLabel_decrypted.setIcon(icon);
 					  
-					  Decrypt_image dc = new Decrypt_image();
-					  try {
-						 cf = dc.get_text(path_picture_original, path_picture_decrypted);
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-					  jtf_ciphertext.setText(cf);
+					 jtf_ciphertext.setText(cf);
 					}
 				}
 				
@@ -212,6 +205,7 @@ public class Encryption  {
 					  {
 						  Encrypt encryptFile = new Encrypt(jtf_key.getText());
 						  encryptFile.EncryptFile(jtf_key.getText(), sourceFile, resultFilePath);
+						  System.out.println("continue");
 						  
 					  }
 					  catch(NullPointerException e){ 

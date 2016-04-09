@@ -7,10 +7,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 
-public class Encrypt extends AES {
+import javax.swing.JOptionPane;
+
+public class Encrypt extends AES implements Runnable {
+	Thread thread;
 	private String cipherTextBase64 = "";
 	private byte Round[][][] = new byte[11][4][4];
 	private ArrayList<Byte> arrayListBytes = new ArrayList<Byte>();
+	///////////
+	private String keyPrivate; 
+	private File sourceFilePrivate;
+	private String outputFilePrivate;
 	private void initRoundKey(String str_key)
 	{
 		byte cipher[][] = new byte[4][4];
@@ -89,14 +96,12 @@ public class Encrypt extends AES {
 	}
 	public void EncryptFile(String key, File sourceFile, String outputFile)
 	{
-		try
-		{
-			convertToHex(key, sourceFile, outputFile);
-		}
-		catch(IOException e)
-		{
-			
-		}
+		keyPrivate = key;
+		sourceFilePrivate = sourceFile;
+		outputFilePrivate = outputFile;
+		thread = new Thread(this, "Encryption file");
+		System.out.println("new thread was created " + thread );
+		thread.start();
 	}
 	public Encrypt(String key){
 		initRoundKey(key);
@@ -155,6 +160,18 @@ public class Encrypt extends AES {
 		}
 		cipherTextBase64 += ConvertToBase64(tempBytes);
 		return cipherTextBase64;
+	}
+	@Override
+	public void run() {
+		try
+		{
+			convertToHex(keyPrivate, sourceFilePrivate, outputFilePrivate);
+		}
+		catch(IOException e)
+		{
+			
+		}
+		JOptionPane.showMessageDialog(null, "File was encrypted!");
 	}
 
 }
