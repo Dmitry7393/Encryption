@@ -9,22 +9,14 @@ import javax.imageio.ImageIO;
 public class DecryptFromImage {
 	private String ciphertextBase64;
 	private BufferedImage img;
-	private int getCountOfBytes()
+	private int getAmountOfBytes()
 	{
-		 byte arrayBytesInt[] = new byte[4];
-		 int clr = img.getRGB(0, 0);  //first pixel
-		 int  red =  (clr & 0x00ff0000) >> 16;
-		 int  green =  (clr & 0x0000ff00) >> 8;
-		 int  blue  =   (clr & 0x000000ff);
-		 arrayBytesInt[0] = (byte) red;
-		 arrayBytesInt[1] = (byte) green;
-		 arrayBytesInt[2] = (byte) blue;
-		 
-		 int clr2 = img.getRGB(1, 0);  //second pixel
-		 int red2 =  (clr2 & 0x00ff0000) >> 16;
-		 arrayBytesInt[3] = (byte) red2;
-		 int sizeCiphertext = getInt(arrayBytesInt);
-		 return sizeCiphertext;
+		byte arrayBytesInt[] = new byte[4];
+		for(int i = 0; i < 4; i++) {
+			arrayBytesInt[i] = getByteFromPixel(i, 0);
+		}
+		int amountEncryptedBytes = getInt(arrayBytesInt);
+		return amountEncryptedBytes;
 	}
 	private byte getByteFromPixel(int j, int i)
 	{
@@ -56,12 +48,13 @@ public class DecryptFromImage {
 	}
 	private byte[] getBytesFromFile() throws IOException
 	{
-		int countBytes = getCountOfBytes();
+		int countBytes = getAmountOfBytes();
 		byte arrayBytesCiphertext[] = new byte[countBytes];
-		int k = 0; //index for array
-		for(int i = 0; i < img.getHeight(); i++) //rows
+		int k = 0;  //index for array
+		int c = 4;  //first four pixels contain size of ciphertext
+		for(int i = 0; i < img.getHeight(); i++)  //rows
 		{
-			for(int j = 2; j < img.getWidth(); j++)
+			for(int j = c; j < img.getWidth(); j++)
 			{	
 				arrayBytesCiphertext[k] = getByteFromPixel(j, i);
 				k++;
@@ -70,6 +63,7 @@ public class DecryptFromImage {
 					return arrayBytesCiphertext;
 				}
 			}
+			c = 0;
 		}
 		return arrayBytesCiphertext;
 	}

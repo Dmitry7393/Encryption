@@ -149,14 +149,20 @@ public class Encryption  {
 					}
 					else
 					{
+						 File file1 = null;  //Output file
+						 JFileChooser fileChooser = new JFileChooser();
+						 if (fileChooser.showSaveDialog(fileChooser) == JFileChooser.APPROVE_OPTION) {
+					  		     file1 = fileChooser.getSelectedFile();
+					        }
 						EncryptInImage encryptInImage = new EncryptInImage(path_picture_original);
-						if(encryptInImage.writeBytesToImage(ciphertextBase64) == false){
+						if(encryptInImage.writeBytesToImage(ciphertextBase64) == true){
+								encryptInImage.saveImage(file1.getPath());
+						} else {
 							JOptionPane.showMessageDialog(null, "Please, choose more large picture "
-							    + "which has at least " + Integer.toString(encryptInImage.getProperCountPixels())
-							    + " pixels");
+								    + "which has at least " + Integer.toString(encryptInImage.getProperCountPixels())
+								    + " pixels");
 						}
-					}
-					
+					}	
 				}
 			}
 		});
@@ -164,6 +170,7 @@ public class Encryption  {
 		{
 			public void actionPerformed(ActionEvent arg0) {
 				JFileChooser fileChooser = new JFileChooser();
+				fileChooser.setAcceptAllFileFilterUsed(false);
 				if (fileChooser.showOpenDialog(open_file) == JFileChooser.APPROVE_OPTION) {
 				  File file = fileChooser.getSelectedFile();
 				  DecryptFromImage dFrImage = new DecryptFromImage(file.getPath());
@@ -178,6 +185,7 @@ public class Encryption  {
 					File sourceFile = null;
 					String resultFilePath = "";
 					JFileChooser fileChooser = new JFileChooser("D:\\");
+					
 					if (fileChooser.showOpenDialog(open_file) == JFileChooser.APPROVE_OPTION) {
 					   sourceFile = fileChooser.getSelectedFile();
 					}

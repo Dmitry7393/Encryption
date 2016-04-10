@@ -11,31 +11,26 @@ import javax.imageio.ImageIO;
 public class EncryptInImage {
 	private BufferedImage img;
 	private int countSourceBytes; 
-	private void initImage(String pathFile) throws IOException
-	{
+	private void initImage(String pathFile) throws IOException {
 		img = ImageIO.read(new File(pathFile)); 
 	}
-	public EncryptInImage(String pathFile)
-	{
+	public EncryptInImage(String pathFile) {
 		try {
 			initImage(pathFile);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 	private void WriteCountBytes(int count)
 	{
 		byte array4Bytes[] = intToByteArray(count);
-		int rgb = new Color(array4Bytes[0], array4Bytes[1], array4Bytes[2]).getRGB();
-		img.setRGB(0, 0, rgb);
-		
-		int clr =  img.getRGB(1, 0); 
-		int red = array4Bytes[3];
-		int  green =  (clr & 0x0000ff00) >> 8;
-		int  blue  =   (clr & 0x000000ff);
-		int  rgb2 = new Color(red, green, blue).getRGB();
-		img.setRGB(1, 0, rgb2);
+		for(int i = 0; i < 4; i++) {
+			try {
+				setByteToPixel(array4Bytes[i], i, 0);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 	private void setByteToPixel(byte myByte, int i, int j) throws IOException
 	{	
@@ -73,74 +68,59 @@ public class EncryptInImage {
 	{
 		//Get bytes from stringBase64
 		byte arrayBytes[] = Base64ToByte(stringBase64);
-		for(int i = 0; i < arrayBytes.length; i++)
-		{
-			System.out.print(arrayBytes[i] +" ");
-		}
 		countSourceBytes = arrayBytes.length; 
 		
 		//If we do not have enough pixels to save information
-		if(arrayBytes.length > (img.getHeight()*img.getWidth()-2)){
+		if(arrayBytes.length > (img.getHeight()*img.getWidth()-4)){
 			return false;
 		}
 		//write in first 4 pixel count of bytes
 		WriteCountBytes(countSourceBytes);
 		
-		int row = 0;
-		int column = 2; //cause the in first 2 pixels we store size of source text
-		for(int i = 0; i < arrayBytes.length; i++)
+		int k = 0; 
+		int c = 4;
+		for(int i = 0; i < img.getHeight(); i++)
 		{
-			try {
-				setByteToPixel(arrayBytes[i], column, row);
-				column++;
-				if(column == img.getWidth()-1)
-				{
-					column = 0;
-					row++;  //next line
+			for(int j = c; j < img.getWidth(); j++)
+			{
+				try {
+					setByteToPixel(arrayBytes[k], j, i);
+					k++;
+					if(k == arrayBytes.length)
+						return true;
+				} catch (IOException e) {
+					e.printStackTrace();
 				}
-			} catch (IOException e) {
-				e.printStackTrace();
 			}
-		}
-	    File outputfile = new File("C:/Users/Dmitry/Desktop/test.png");
-		try {
-			ImageIO.write(img, "png", outputfile); //save new picture
-		} catch (IOException e) {
-			e.printStackTrace();
+			c = 0;
 		}
 		return true;
 	}
+	public void saveImage(String pathNewFile)
+	{
+	    File outputfile = new File(pathNewFile);
+			try {
+				ImageIO.write(img, "png", outputfile); //save new picture
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+	}
 	public int getProperCountPixels()
 	{
-		return countSourceBytes;
+		return countSourceBytes+4;
 	}
 	//Convert string in base64 to array of bytes
-	public  byte[] Base64ToByte(String myText)
+	private  byte[] Base64ToByte(String myText)
 	{
 		byte[] decoded = Base64.getDecoder().decode(myText);
 		return decoded;
 	}
 	//devide int to 4 bytes and return array of 4 bytes
-	public final byte[] intToByteArray(int value) {
+	private final byte[] intToByteArray(int value) {
 	    return new byte[] {
 	            (byte)(value >>> 24),
 	            (byte)(value >>> 16),
 	            (byte)(value >>> 8),
 	            (byte)value};
-	}
-	//For debug
-	public  void showBitsInt(int myInt, String str)
-	{
-		String strMaskFirst3 = Integer.toBinaryString(myInt);
-		System.out.println(str + " " + myInt + " :" + strMaskFirst3);
-	}
-	public  void show(byte myByte, String str)
-	{
-		String strMaskFirst3 = Integer.toBinaryString(myByte);
-		System.out.println(str + " " + myByte + " :" + strMaskFirst3);
-	}
-	public  void showInt(int t, String str)
-	{
-		System.out.println(str + " " + t);
 	}
 }
