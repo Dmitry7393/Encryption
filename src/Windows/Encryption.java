@@ -18,7 +18,10 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import AES.Decrypt;
 import AES.Encrypt;
@@ -28,58 +31,62 @@ import Image.EncryptInImage;
 public class Encryption  {
 	private JButton btn_encrypt = new JButton("Encrypt");
 	private JButton btn_decrypt = new JButton("Decrypt");
-	private JButton btn_encrypt_image = new JButton("Write ciphertext to image");
-	private JButton btn_open_image = new JButton("Upload image");
+	private JButton btn_encrypt_image = new JButton("Save ciphertext in image");
+	private JButton btn_upload_image = new JButton("Upload image");
 	private JButton btnGetCiphertextFromImage = new JButton("Get ciphertext from image");
 	private JButton btn_encrypt_file = new JButton("Encrypt file");
 	private JButton btn_decrypt_file = new JButton("Decrypt file");
+	private JButton open_file = new JButton("Open file to decrypt");
+	
 	private JLabel str_key = new JLabel("Key");
 	private JLabel str_plaintext = new JLabel("Plaintext");
 	private JLabel str_ciphertext = new JLabel("Ciphertext");
-	private JTextField jtf_plaintext ;
+	
 	private JTextField jtf_key ;
 	private JTextField jtf_ciphertext ;
-	//private JTextArea textArea = new JTextArea (5, 5);
-	private JButton open_file = new JButton("Open file to decrypt");
+	
+	private JTextArea plainTextArea = new JTextArea(5, 20); 
+	private JTextArea cipherTextArea = new JTextArea (5, 20);
+	
 	private GridBagConstraints gbc ;
 	private  JLabel picLabel_original = new JLabel();
 	private  JLabel picLabel_decrypted = new JLabel();
-	//private JTabbedPane  tab = new JTabbedPane();
+	
 	private String path_picture_original = "";
-	 Encryption() throws IOException 
+	
+	Encryption() throws IOException 
 	{
-		 
-		// image_original = ImageIO.read(new File("D:/image.png")).getScaledInstance(100, 100, Image.SCALE_FAST);
-			
-		// picLabel	= new JLabel(new ImageIcon(image_original));
-		/* picLabel.setSize(100, 100);
-		 Dimension maximumSize = new Dimension(100, 100);
-		 
-		 picLabel.setMaximumSize(maximumSize);
-		 picLabel.setPreferredSize(maximumSize);*/
+	    JFrame frame = new JFrame("Encryption");
+	    frame.setSize(920, 500);
+	    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
 		JPanel panel = new JPanel(new GridBagLayout());
+		plainTextArea.setText("Two One Nine Two");
+		 
+		JScrollPane scrollPlainTextArea = new JScrollPane (plainTextArea);  
+		//scroll.setBounds(100, 10, 100, 10);
+		scrollPlainTextArea.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		scrollPlainTextArea.setVisible(true);
+
+		JScrollPane scrollCiphertextArea = new JScrollPane (cipherTextArea);  
+		scrollCiphertextArea.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		scrollCiphertextArea.setVisible(true);
+		
 	    gbc = new GridBagConstraints();
 	    gbc.insets = new Insets(0,20,20,0);
-	  //  gbc.weightx = 1.0;
 	    gbc.anchor = GridBagConstraints.NORTHWEST;
-	  // gbc.gridwidth = GridBagConstraints.REMAINDER;
-	    
-	    JFrame jfrm = new JFrame("Encryption");
-		   jfrm.setSize(920, 500);
-		   jfrm.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	
 
-		   jtf_key = new JTextField(20);
-		   jtf_plaintext = new JTextField(20);
-		   jtf_ciphertext = new JTextField(20);
+	    jtf_key = new JTextField(20);
+		jtf_ciphertext = new JTextField(20);
 		jtf_key.setText("Thats my Kung Fu");
-		jtf_plaintext.setText("Two One Nine Two");
-		JLabel jlab = new JLabel("_________");
+		
 		btn_encrypt.addActionListener(new ActionListener()
 			{
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
 					
-					String str_plain_text = jtf_plaintext.getText();
+					String str_plain_text = plainTextArea.getText();
 					String str_key = jtf_key.getText();
 					Encrypt encrText = new Encrypt(str_key);
 					encrText.EncryptText(str_plain_text, str_key);
@@ -97,10 +104,10 @@ public class Encryption  {
 				else
 				{
 					String plain_text = jtf_ciphertext.getText();
-					Decrypt d = new Decrypt(jtf_key.getText());
-					d.DecryptText(plain_text, jtf_key.getText());
-					String source_text = d.get_text();
-					jlab.setText(source_text);
+					Decrypt decrypt = new Decrypt(jtf_key.getText());
+					decrypt.DecryptText(plain_text, jtf_key.getText());
+					cipherTextArea.setText("");
+					cipherTextArea.setText(decrypt.get_text());
 				}
 				
 			}
@@ -118,7 +125,7 @@ public class Encryption  {
 			}
 		});
 		
-		btn_open_image.addActionListener(new ActionListener()  //Just open image
+		btn_upload_image.addActionListener(new ActionListener()  //Just open image
 		{
 			public void actionPerformed(ActionEvent arg0) {
 				JFileChooser fileChooser = new JFileChooser("D:\\");
@@ -127,7 +134,7 @@ public class Encryption  {
 				  path_picture_original = file.getPath();
 				  ImageIcon icon = new ImageIcon(file.getPath());
 				  Image img = icon.getImage();
-				  Image newimg = img.getScaledInstance(100, 100,  java.awt.Image.SCALE_SMOOTH);
+				  Image newimg = img.getScaledInstance(40, 40,  java.awt.Image.SCALE_SMOOTH);
 				  icon = new ImageIcon(newimg);
 				  picLabel_original.setIcon(icon);
 					}
@@ -244,7 +251,7 @@ public class Encryption  {
 		
 		gbc.gridx = 1;
 		gbc.gridy = 0;
-		panel.add(jtf_plaintext, gbc);
+		panel.add(scrollPlainTextArea, gbc);
 		
 		//Second row
 		gbc.gridx = 0;
@@ -276,7 +283,7 @@ public class Encryption  {
 		
 		gbc.gridx = 2;
 		gbc.gridy = 0;
-		panel.add(jlab, gbc);
+		panel.add(scrollCiphertextArea, gbc);
 		
 		gbc.gridx = 0;
 		gbc.gridy = 4;
@@ -287,15 +294,13 @@ public class Encryption  {
 		//panel.add(textArea, gbc);
 		//////////
 
-			gbc.gridx = 1;
-			gbc.gridy = 5;
-			panel.add(picLabel_original, gbc);
+		gbc.gridx = 1;
+		gbc.gridy = 5;
+		panel.add(picLabel_original, gbc);
 	
-
-		
 		gbc.gridx = 0;
 		gbc.gridy = 5;
-		panel.add(btn_open_image, gbc);
+		panel.add(btn_upload_image, gbc);
 		
 		gbc.gridx = 0;
 		gbc.gridy = 6;
@@ -317,9 +322,10 @@ public class Encryption  {
 		gbc.gridy = 7;
 		panel.add(btn_decrypt_file, gbc); 
 		
-		   jfrm.add(panel);
-		jfrm.setLocation(100, 100);
-		jfrm.setVisible(true);
+		frame.add(panel);
+		frame.setLocationRelativeTo(null);
+		frame.setLocation(100, 100);
+		frame.setVisible(true);
 	}
 	public static void main(String[] args) {
 		SwingUtilities.invokeLater(new Runnable()
