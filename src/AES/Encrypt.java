@@ -5,7 +5,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
 
@@ -112,9 +111,8 @@ public class Encrypt extends AES implements Runnable {
 		int value = 0;
 
 		//First write bytes from image imageEncryptedFile.png to new file
-		 URL url = Encrypt.class.getResource("/resources/imageEncryptedFile.png");
-		 InputStream inputStreamImage = new FileInputStream(url.getPath());
-		while ((value = inputStreamImage.read()) != -1) {    
+		 InputStream inputStreamImage = Encrypt.class.getResourceAsStream("/resources/imageEncryptedFile.png");
+		 while ((value = inputStreamImage.read()) != -1) {    
 			fos.write((byte) value);
 		}
 		inputStreamImage.close();

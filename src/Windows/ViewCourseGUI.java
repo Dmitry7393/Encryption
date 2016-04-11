@@ -13,8 +13,7 @@ public class ViewCourseGUI extends JFrame{
     private int locationX;
     private int locationY;
     private  Image img;
-    JLabel imageLabel ;
-    ImageIcon imageIcon;
+    private JLabel imageLabel ;
      public  ViewCourseGUI(int a, int b){
     	 widthWindow = a;
     	 heightWindow = b;
@@ -24,9 +23,8 @@ public class ViewCourseGUI extends JFrame{
     	 locationX = a;
     	 locationY = b;
      }
-     public void setPicture(ImageIcon imageIcon1)
+     public void setPicture(ImageIcon imageIcon)
      {
-    	  imageIcon = imageIcon1;
     	 frame.setSize(widthWindow, heightWindow);
          frame.setLocation(locationX, locationY);
          frame.setVisible(true);  

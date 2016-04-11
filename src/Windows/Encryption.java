@@ -10,6 +10,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
+
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -120,13 +122,18 @@ public class Encryption  {
 				 jtf_ciphertext.setText(plain_text);
 				// textArea.setText(plain_text);
 				}*/
+				 URL url = Encrypt.class.getResource("/resources/imageEncryptedFile.png");
+				 ImageIcon iii = new ImageIcon(url);
+				  ViewCourseGUI viewCourseGUI = new ViewCourseGUI(400, 300);
+				  viewCourseGUI.setLocation(frame.getLocation().x+100, frame.getLocation().y+50);
+				  viewCourseGUI.setPicture(iii);
 			}
 		});
 		
 		btn_upload_image.addActionListener(new ActionListener()  //Just open image
 		{
 			public void actionPerformed(ActionEvent arg0) {
-				JFileChooser fileChooser = new JFileChooser("D:\\");
+				JFileChooser fileChooser = new JFileChooser(System.getProperty("user.dir"));
 				if (fileChooser.showOpenDialog(open_file) == JFileChooser.APPROVE_OPTION) {
 					  File file = fileChooser.getSelectedFile();
 					  pathOriginalImage = file.getPath();
@@ -158,7 +165,7 @@ public class Encryption  {
 					else
 					{
 						 File file1 = null;  //Output file
-						 JFileChooser fileChooser = new JFileChooser();
+						 JFileChooser fileChooser = new JFileChooser(System.getProperty("user.dir"));
 						 if (fileChooser.showSaveDialog(fileChooser) == JFileChooser.APPROVE_OPTION) {
 					  		     file1 = fileChooser.getSelectedFile();
 					        }
@@ -177,7 +184,7 @@ public class Encryption  {
 		btnGetCiphertextFromImage.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent arg0) {
-				JFileChooser fileChooser = new JFileChooser();
+				JFileChooser fileChooser = new JFileChooser(System.getProperty("user.dir"));
 				fileChooser.setAcceptAllFileFilterUsed(false);
 				if (fileChooser.showOpenDialog(open_file) == JFileChooser.APPROVE_OPTION) {
 				  File file = fileChooser.getSelectedFile();
@@ -192,7 +199,7 @@ public class Encryption  {
 				public void actionPerformed(ActionEvent arg0) {
 					File sourceFile = null;
 					String resultFilePath = "";
-					JFileChooser fileChooser = new JFileChooser("D:\\");
+					JFileChooser fileChooser = new JFileChooser(System.getProperty("user.dir"));
 					
 					if (fileChooser.showOpenDialog(open_file) == JFileChooser.APPROVE_OPTION) {
 					   sourceFile = fileChooser.getSelectedFile();
@@ -205,8 +212,7 @@ public class Encryption  {
 					  {
 						  Encrypt encryptFile = new Encrypt(jtf_key.getText());
 						  encryptFile.EncryptFile(jtf_key.getText(), sourceFile, resultFilePath);
-						  System.out.println("continue");
-						  
+						  System.out.println("continue"); 
 					  }
 					  catch(NullPointerException e){ 
 						  System.out.println("NullPointerException: " + e);
@@ -220,7 +226,7 @@ public class Encryption  {
 			public void actionPerformed(ActionEvent arg0) {
 				File sourceFile = null;
 				String resultFilePath = "";
-				JFileChooser fileChooser = new JFileChooser("D:\\");
+				JFileChooser fileChooser = new JFileChooser(System.getProperty("user.dir"));
 				if (fileChooser.showOpenDialog(open_file) == JFileChooser.APPROVE_OPTION) {
 				   sourceFile = fileChooser.getSelectedFile();
 				}
