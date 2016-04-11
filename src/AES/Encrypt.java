@@ -5,9 +5,13 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 
+import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
+
+import Windows.Encryption;
 
 public class Encrypt extends AES implements Runnable {
 	Thread thread;
@@ -111,6 +115,9 @@ public class Encrypt extends AES implements Runnable {
 		FileOutputStream fos = new FileOutputStream(pathNew);
 		int bytesCounter = 0;		
 		int value = 0;
+		//First write to new file image 
+		 URL url = Encryption.class.getResource("/resources/imageEncryptedFile.png");
+		 ImageIcon icon = new ImageIcon(url);
 		int j = 0;
 		byte block4_4[][] = new byte[4][4];
 		byte encryptedBytes[] = new byte[16];

@@ -6,11 +6,10 @@ import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedReader;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
-
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -51,8 +50,8 @@ public class Encryption  {
 	private GridBagConstraints gbc ;
 	private  JLabel picLabel_original = new JLabel();
 	private  JLabel picLabel_decrypted = new JLabel();
-	
-	private String path_picture_original = "";
+	private ImageIcon imageIconOriginal;
+	private String pathOriginalImage = "";
 	
 	Encryption() throws IOException 
 	{
@@ -76,7 +75,6 @@ public class Encryption  {
 	    gbc.insets = new Insets(0,20,20,0);
 	    gbc.anchor = GridBagConstraints.NORTHWEST;
 	
-
 	    jtf_key = new JTextField(20);
 		jtf_ciphertext = new JTextField(20);
 		jtf_key.setText("Thats my Kung Fu");
@@ -115,13 +113,13 @@ public class Encryption  {
 		open_file.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent arg0) {
-				JFileChooser fileChooser = new JFileChooser("D:\\");
+			/*	JFileChooser fileChooser = new JFileChooser("D:\\");
 				if (fileChooser.showOpenDialog(open_file) == JFileChooser.APPROVE_OPTION) {
 				  File file = fileChooser.getSelectedFile();
 				 String plain_text = read_file(file.getPath());
 				 jtf_ciphertext.setText(plain_text);
 				// textArea.setText(plain_text);
-				}
+				}*/
 			}
 		});
 		
@@ -130,13 +128,16 @@ public class Encryption  {
 			public void actionPerformed(ActionEvent arg0) {
 				JFileChooser fileChooser = new JFileChooser("D:\\");
 				if (fileChooser.showOpenDialog(open_file) == JFileChooser.APPROVE_OPTION) {
-				  File file = fileChooser.getSelectedFile();
-				  path_picture_original = file.getPath();
-				  ImageIcon icon = new ImageIcon(file.getPath());
-				  Image img = icon.getImage();
-				  Image newimg = img.getScaledInstance(40, 40,  java.awt.Image.SCALE_SMOOTH);
-				  icon = new ImageIcon(newimg);
-				  picLabel_original.setIcon(icon);
+					  File file = fileChooser.getSelectedFile();
+					  pathOriginalImage = file.getPath();
+					  ImageIcon imageIcon = new ImageIcon(file.getPath());
+					  imageIconOriginal = imageIcon; //save the original image
+					  int widthIcon = 60;
+					  double heightIcon = (widthIcon * imageIcon.getIconHeight()) / imageIcon.getIconWidth();
+					  Image img = imageIcon.getImage();
+					  img = img.getScaledInstance(widthIcon, (int) heightIcon,  java.awt.Image.SCALE_SMOOTH);
+					  imageIcon = new ImageIcon(img);
+					  picLabel_original.setIcon(imageIcon);
 					}
 			}
 		});
@@ -150,7 +151,7 @@ public class Encryption  {
 				}
 				else
 				{
-					if(path_picture_original.compareTo("") == 0)
+					if(pathOriginalImage.compareTo("") == 0)
 					{
 						JOptionPane.showMessageDialog(null, "Upload image!");
 					}
@@ -161,7 +162,7 @@ public class Encryption  {
 						 if (fileChooser.showSaveDialog(fileChooser) == JFileChooser.APPROVE_OPTION) {
 					  		     file1 = fileChooser.getSelectedFile();
 					        }
-						EncryptInImage encryptInImage = new EncryptInImage(path_picture_original);
+						EncryptInImage encryptInImage = new EncryptInImage(pathOriginalImage);
 						if(encryptInImage.writeBytesToImage(ciphertextBase64) == true){
 								encryptInImage.saveImage(file1.getPath());
 						} else {
@@ -238,16 +239,20 @@ public class Encryption  {
 			}
 	
 		});
-			//textArea.setSize(100,100);  
-		  //  textArea.setEditable(false);
-		    //textArea.setVisible(true);
-		//    JScrollPane scroll = new JScrollPane (textArea);
-	//	    scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-		   //       scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-		//First row
+		picLabel_original.addMouseListener(new MouseAdapter()
+		{
+		    public void mouseClicked(MouseEvent e) 
+		    {
+		    	  int preferredWidth = 600;
+		    	  double preferredHeight = (preferredWidth * imageIconOriginal.getIconHeight()) / imageIconOriginal.getIconWidth();
+				  ViewCourseGUI viewCourseGUI = new ViewCourseGUI(preferredWidth, (int) preferredHeight);
+				  viewCourseGUI.setLocation(frame.getLocation().x+100, frame.getLocation().y+50);
+				  viewCourseGUI.setPicture(imageIconOriginal);
+		    }
+		});
 		gbc.gridx = 0;
 		gbc.gridy = 0;
-		panel.add(str_plaintext, gbc); //
+		panel.add(str_plaintext, gbc);
 		
 		gbc.gridx = 1;
 		gbc.gridy = 0;
@@ -271,12 +276,10 @@ public class Encryption  {
 		panel.add(jtf_ciphertext, gbc);
 		
 		//4
-		
 		gbc.gridx = 0;
 		gbc.gridy =  3;
-		//gbc.ipady = 10;
-		//gbc.ipadx = 10;
 		panel.add(btn_encrypt, gbc);
+		
 		gbc.gridx = 1;
 		gbc.gridy = 3;
 		panel.add(btn_decrypt, gbc);
@@ -289,11 +292,6 @@ public class Encryption  {
 		gbc.gridy = 4;
 		panel.add(open_file, gbc);
 		
-		//gbc.gridx = 1;
-		//gbc.gridy = 4;
-		//panel.add(textArea, gbc);
-		//////////
-
 		gbc.gridx = 1;
 		gbc.gridy = 5;
 		panel.add(picLabel_original, gbc);
@@ -340,7 +338,7 @@ public class Encryption  {
 			}
 		});
 	}
-	private static String read_file(String path)
+	/*private static String read_file(String path)
     {
 		BufferedReader br = null;
 		String source_string = "";
@@ -363,5 +361,5 @@ public class Encryption  {
 			}
 		}
 		return source_string;
-    }
+    }*/
 }
