@@ -7,11 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
-
-import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
-
-import Windows.Encryption;
 
 public class Encrypt extends AES implements Runnable {
 	Thread thread;
@@ -112,13 +108,20 @@ public class Encrypt extends AES implements Runnable {
 	}
     public  void convertToHex(String key, File file, String pathNew) throws IOException {
 		InputStream is = new FileInputStream(file);
-		FileOutputStream fos = new FileOutputStream(pathNew);
-		int bytesCounter = 0;		
+		FileOutputStream fos = new FileOutputStream(pathNew);	
 		int value = 0;
-		//First write to new file image 
-		 URL url = Encryption.class.getResource("/resources/imageEncryptedFile.png");
-		 ImageIcon icon = new ImageIcon(url);
+
+		//First write bytes from image imageEncryptedFile.png to new file
+		 URL url = Encrypt.class.getResource("/resources/imageEncryptedFile.png");
+		 InputStream inputStreamImage = new FileInputStream(url.getPath());
+		while ((value = inputStreamImage.read()) != -1) {    
+			fos.write((byte) value);
+		}
+		inputStreamImage.close();
+		
 		int j = 0;
+		int bytesCounter = 0;
+		value = 0;
 		byte block4_4[][] = new byte[4][4];
 		byte encryptedBytes[] = new byte[16];
 		byte currentBytes[] = new byte[16];
