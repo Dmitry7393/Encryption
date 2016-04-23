@@ -1,9 +1,16 @@
 package Windows;
 
+import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Insets;
+import java.util.List;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -12,6 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -62,6 +70,35 @@ public class Encryption  {
 	    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		JPanel panel = new JPanel(new GridBagLayout());
+		JPanel panelEncrypt = new JPanel();
+		
+		panelEncrypt.setPreferredSize(new Dimension(50, 20));
+		panelEncrypt.setVisible(true);
+		panelEncrypt.setDropTarget(new DropTarget() {
+			   private static final long serialVersionUID = 1L;
+			   public synchronized void drop(DropTargetDropEvent evt) {
+			          try {
+			               evt.acceptDrop(DnDConstants.ACTION_COPY);
+			               List<File> droppedFiles = (List<File>)evt.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
+			               JFileChooser f = new JFileChooser();
+			                    f.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY); 
+			                    f.showSaveDialog(null);
+			                    
+			                    System.out.println(f.getSelectedFile());
+			                    Encrypt encryptFile = new Encrypt(jtf_key.getText());
+			       
+			                for (File file : droppedFiles) {
+			                  encryptFile.EncryptFile(jtf_key.getText(), file, f.getSelectedFile() + "/" + file.getName() + "_encrypted.png");
+			                  //Waiting when previous file will be encrypted
+			                }
+			          } catch (Exception ex) {
+			              ex.printStackTrace();
+			          }
+			      }
+			  });
+
+		panelEncrypt.setBorder(BorderFactory.createLineBorder(Color.RED, 2, true));
+		
 		plainTextArea.setText("Two One Nine Two");
 		 
 		JScrollPane scrollPlainTextArea = new JScrollPane (plainTextArea);  
@@ -313,6 +350,10 @@ public class Encryption  {
 		gbc.gridx = 1;
 		gbc.gridy = 6;
 		panel.add(btnGetCiphertextFromImage, gbc);
+		
+		gbc.gridx = 2;
+		gbc.gridy = 1;
+		panel.add(panelEncrypt, gbc);
 		
 		gbc.gridx = 2;
 		gbc.gridy = 5;
