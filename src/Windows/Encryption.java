@@ -20,6 +20,8 @@ import java.io.IOException;
 import java.net.URL;
 
 import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -69,35 +71,46 @@ public class Encryption  {
 	    frame.setSize(920, 500);
 	    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
-		JPanel panel = new JPanel(new GridBagLayout());
-		JPanel panelEncrypt = new JPanel();
+		JPanel panel = new JPanel(new GridBagLayout()); //main panel
 		
-		panelEncrypt.setPreferredSize(new Dimension(50, 20));
+		JPanel panelEncrypt = new JPanel();
+		//Put text "Drag files here to encrypt them" in the middle of panel
+		panelEncrypt.setLayout(new BoxLayout(panelEncrypt, BoxLayout.X_AXIS ));
+		
+		JLabel label_encrypt = new JLabel("Drag files here to encrypt them");
+		
+		panelEncrypt.setPreferredSize(new Dimension(240,100));
 		panelEncrypt.setVisible(true);
+		
+		panelEncrypt.add(Box.createHorizontalGlue());
+		panelEncrypt.add(label_encrypt);
+		panelEncrypt.add(Box.createHorizontalGlue());
+		
 		panelEncrypt.setDropTarget(new DropTarget() {
 			   private static final long serialVersionUID = 1L;
 			   public synchronized void drop(DropTargetDropEvent evt) {
 			          try {
 			               evt.acceptDrop(DnDConstants.ACTION_COPY);
-			               List<File> droppedFiles = (List<File>)evt.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
+			               @SuppressWarnings("unchecked")
+						List<File> droppedFiles = (List<File>)evt.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
 			               JFileChooser f = new JFileChooser();
 			                    f.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY); 
 			                    f.showSaveDialog(null);
-			                    
-			                    System.out.println(f.getSelectedFile());
-			                    Encrypt encryptFile = new Encrypt(jtf_key.getText());
-			       
-			                for (File file : droppedFiles) {
-			                  encryptFile.EncryptFile(jtf_key.getText(), file, f.getSelectedFile() + "/" + file.getName() + "_encrypted.png");
-			                  //Waiting when previous file will be encrypted
-			                }
+			                   if(f.getSelectedFile() != null)
+			                   {
+			                	   for (File file : droppedFiles) {
+					                	Encrypt encryptFile = new Encrypt(jtf_key.getText());
+					                  encryptFile.EncryptFile(jtf_key.getText(), file, f.getSelectedFile() + "/" + file.getName() + "_encrypted.png");
+					                  //Waiting when previous file will be encrypted
+					                }
+			                   }
 			          } catch (Exception ex) {
 			              ex.printStackTrace();
 			          }
 			      }
 			  });
-
 		panelEncrypt.setBorder(BorderFactory.createLineBorder(Color.RED, 2, true));
+		
 		
 		plainTextArea.setText("Two One Nine Two");
 		 
@@ -353,6 +366,7 @@ public class Encryption  {
 		
 		gbc.gridx = 2;
 		gbc.gridy = 1;
+		gbc.gridheight = 3;
 		panel.add(panelEncrypt, gbc);
 		
 		gbc.gridx = 2;
