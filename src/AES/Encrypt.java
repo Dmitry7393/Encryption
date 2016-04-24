@@ -15,6 +15,7 @@ public class Encrypt extends AES implements Runnable {
 	private ArrayList<Byte> arrayListBytes = new ArrayList<Byte>();
 	private List<File> sourceFilesList = new ArrayList<File>();
 	private List<String> outputPathsList = new ArrayList<String>();
+	private long CommonSizeOfFiles = 0;
 	private void initRoundKey(String str_key)
 	{
 		byte cipher[][] = new byte[4][4];
@@ -108,6 +109,7 @@ public class Encrypt extends AES implements Runnable {
 	}
 	public Encrypt(String key){
 		initRoundKey(key);
+		CommonSizeOfFiles = 81980;
 	}
     public  void convertToHex(File file, String pathNew) throws IOException {
 		InputStream is = new FileInputStream(file);
@@ -156,12 +158,13 @@ public class Encrypt extends AES implements Runnable {
 			fos.close();
 	        is.close();
 	  }
-  public static void WriteFile(FileOutputStream fos, byte[] arrayBytes) throws IOException
+  public void WriteFile(FileOutputStream fos, byte[] arrayBytes) throws IOException
 	{
 		for(int i = 0; i < 16; i++)
 		{
 			fos.write(arrayBytes[i]);
 		}
+		CommonSizeOfFiles +=  arrayBytes.length;
 	}
 	public String getCipherText()
 	{
@@ -186,6 +189,9 @@ public class Encrypt extends AES implements Runnable {
 	}
 	public Boolean threadIsAlive() {
 		return thread.isAlive();
+	}
+	public long getCommonSizeOfFiles() {
+		return CommonSizeOfFiles;
 	}
 }
 

@@ -37,13 +37,31 @@ public class TabEncryptFiles extends JPanel {
 	private JButton open_file = new JButton("Open file to decrypt");
 	private JLabel str_key = new JLabel("Key");
 	private JCheckBox checkBoxArchive = new JCheckBox("Save files to archive");
-	
-	private File sourceFileSingle;
-	private String outputFilePathSingle = "";
+
 	private  Encrypt encryptFile;
+	private long sizeOfSourceFiles = 0;
 	public TabEncryptFiles() {
 		
 		setLayout(new GridBagLayout());
+		
+	    JProgressBar progressBar = new JProgressBar();
+	    progressBar.setStringPainted(true);
+	    progressBar.setMinimum(0);
+	    progressBar.setMaximum(100);
+	    Border border = BorderFactory.createTitledBorder("Encryption...");
+	    progressBar.setBorder(border);
+	    
+		 Timer timer = new Timer(100, new ActionListener() {
+			  @Override
+			  public void actionPerformed(ActionEvent arg0) {
+				long value1 = (100 * encryptFile.getCommonSizeOfFiles()) / sizeOfSourceFiles ;
+				  progressBar.setValue((int) value1);
+				  if(encryptFile.threadIsAlive() == false) {
+					  ((Timer)arg0.getSource()).stop();
+					  JOptionPane.showMessageDialog(null, "File was encrypted!!!");
+				  }
+			  }
+			});
 		JPanel panelEncrypt = new JPanel();
 		panelEncrypt.setLayout(new BoxLayout(panelEncrypt, BoxLayout.X_AXIS ));
 		
@@ -65,6 +83,10 @@ public class TabEncryptFiles extends JPanel {
 			                f.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY); 
 			                f.showSaveDialog(null);
 			                   List<String> outputPaths = new ArrayList<String>();
+			                   for (File file : droppedFiles) 
+		                	   {
+			                	   sizeOfSourceFiles += file.length();
+		                	   }
 			                   if(f.getSelectedFile() != null)
 			                   {
 			                	   for(int i = 0; i < droppedFiles.size(); i++) {
@@ -72,6 +94,7 @@ public class TabEncryptFiles extends JPanel {
 			                	   }
 			                	   encryptFile = new Encrypt(jtf_key.getText());
 			                	   encryptFile.EncryptGroupsOfFiles(droppedFiles, outputPaths);
+			                	   timer.start(); 
 			                   }
 			          } catch (Exception ex) {
 			              ex.printStackTrace();
@@ -80,13 +103,7 @@ public class TabEncryptFiles extends JPanel {
 			  });
 		panelEncrypt.setBorder(BorderFactory.createLineBorder(Color.RED, 2, true));
 				
-	    JProgressBar progressBar = new JProgressBar();
-	    //progressBar.setValue(58);
-	    progressBar.setStringPainted(true);
-	    progressBar.setMinimum(0);
-	    progressBar.setMaximum(100);
-	    Border border = BorderFactory.createTitledBorder("Encryption...");
-	    progressBar.setBorder(border);
+
 	    
 	    gbc = new GridBagConstraints();
 	    gbc.insets = new Insets(0,20,20,0);
@@ -95,40 +112,30 @@ public class TabEncryptFiles extends JPanel {
 	    jtf_key = new JTextField(20);
 		
 		jtf_key.setText("Thats my Kung Fu");
-		 Timer timer = new Timer(100, new ActionListener() {
-			  @Override
-			  public void actionPerformed(ActionEvent arg0) {
-			       File fs = new File(outputFilePathSingle);
-				long value1 = (fs.length() * 100) / sourceFileSingle.length();
-				  progressBar.setValue((int) value1);
-				  if(encryptFile.threadIsAlive() == false) {
-					  ((Timer)arg0.getSource()).stop();
-					  JOptionPane.showMessageDialog(null, "File was encrypted!!!");
-				  }
-			  }
-			});
+
 		btn_encrypt_file.addActionListener(new ActionListener()
 			{
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
 					File sourceFile = null;
+					File fileOutput = null;
 					
 					JFileChooser fileChooser = new JFileChooser(System.getProperty("user.dir"));
 					fileChooser.setPreferredSize(new Dimension(1000, 600)); 
+					
 					if (fileChooser.showOpenDialog(open_file) == JFileChooser.APPROVE_OPTION) {
 					   sourceFile = fileChooser.getSelectedFile();
-					   sourceFileSingle = fileChooser.getSelectedFile();
+					   sizeOfSourceFiles = sourceFile.length(); //size of 1 file
 					}
 					 if (fileChooser.showSaveDialog(fileChooser) == JFileChooser.APPROVE_OPTION) {
-				  		    File file = fileChooser.getSelectedFile();
-				  		  outputFilePathSingle = file.getPath();
+						 fileOutput = fileChooser.getSelectedFile();
 				        }
-					 if(sourceFile != null && outputFilePathSingle != null) {
+					 if(sourceFile != null && fileOutput != null) {
 						 try
 						  {
 							  encryptFile = new Encrypt(jtf_key.getText());
-							  encryptFile.EncryptFile(sourceFile, outputFilePathSingle);
-							  timer.start(); //calculate the size of file
+							  encryptFile.EncryptFile(sourceFile, fileOutput.getPath());
+							  timer.start(); 
 						  }
 						  catch(NullPointerException e){ 
 							  System.out.println("NullPointerException: " + e);
