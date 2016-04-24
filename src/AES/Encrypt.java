@@ -6,7 +6,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import javax.swing.JOptionPane;
 
 public class Encrypt extends AES implements Runnable {
 	Thread thread;
@@ -171,12 +170,12 @@ public class Encrypt extends AES implements Runnable {
 		{
 			convertToHex(sourceFilePrivate, outputFilePrivate);
 		}
-		catch(IOException e)
-		{
+		catch(IOException e){
 			
 		}
-		JOptionPane.showMessageDialog(null, "File was encrypted!");
 	}
-
+	public Boolean threadIsAlive() {
+		return thread.isAlive();
+	}
 }
 

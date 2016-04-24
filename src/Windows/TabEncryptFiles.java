@@ -20,8 +20,12 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.JTextField;
+import javax.swing.Timer;
+import javax.swing.border.Border;
 
 import AES.Decrypt;
 import AES.Encrypt;
@@ -35,6 +39,9 @@ public class TabEncryptFiles extends JPanel {
 	private JButton open_file = new JButton("Open file to decrypt");
 	private JLabel str_key = new JLabel("Key");
 	private JCheckBox checkBoxArchive = new JCheckBox("Save files to archive");
+	
+	private File sourceFileSingle;
+	private String outputFilePathSingle = "";
 	public TabEncryptFiles() {
 		
 		setLayout(new GridBagLayout());
@@ -107,8 +114,15 @@ public class TabEncryptFiles extends JPanel {
 			      }
 			  });
 		panelDecrypt.setBorder(BorderFactory.createLineBorder(Color.GREEN, 2, true));
-				
 		
+	    JProgressBar progressBar = new JProgressBar();
+	    //progressBar.setValue(58);
+	    progressBar.setStringPainted(true);
+	    progressBar.setMinimum(0);
+	    progressBar.setMaximum(100);
+	    Border border = BorderFactory.createTitledBorder("Encryption...");
+	    progressBar.setBorder(border);
+	    
 	    gbc = new GridBagConstraints();
 	    gbc.insets = new Insets(0,20,20,0);
 	    gbc.anchor = GridBagConstraints.NORTHWEST;
@@ -116,28 +130,53 @@ public class TabEncryptFiles extends JPanel {
 	    jtf_key = new JTextField(20);
 		
 		jtf_key.setText("Thats my Kung Fu");
-
+		 Timer timer = new Timer(100, new ActionListener() {
+			  @Override
+			  public void actionPerformed(ActionEvent arg0) {
+				//  sourceFilePathSingle.length()
+			        File fs = new File(outputFilePathSingle);
+				long value1 = (fs.length() * 100) / sourceFileSingle.length();
+			    //    long size = fs.getFileSize("myFile.txt");
+				  System.out.println("result file Size: " +  fs.length());
+				  progressBar.setValue((int) value1);
+			  }
+			});
 		btn_encrypt_file.addActionListener(new ActionListener()
 			{
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
 					File sourceFile = null;
-					String resultFilePath = "";
-					JFileChooser fileChooser = new JFileChooser(System.getProperty("user.dir"));
 					
+					JFileChooser fileChooser = new JFileChooser(System.getProperty("user.dir"));
+					fileChooser.setPreferredSize(new Dimension(1000, 600)); 
 					if (fileChooser.showOpenDialog(open_file) == JFileChooser.APPROVE_OPTION) {
 					   sourceFile = fileChooser.getSelectedFile();
+					   sourceFileSingle = fileChooser.getSelectedFile();
 					}
 					 if (fileChooser.showSaveDialog(fileChooser) == JFileChooser.APPROVE_OPTION) {
 				  		    File file = fileChooser.getSelectedFile();
-				  		  resultFilePath = file.getPath();
+				  		  outputFilePathSingle = file.getPath();
 				        }
-					 if(sourceFile != null && resultFilePath != null) {
+					 if(sourceFile != null && outputFilePathSingle != null) {
 						 try
 						  {
 							  Encrypt encryptFile = new Encrypt(jtf_key.getText());
-							  encryptFile.EncryptFile(jtf_key.getText(), sourceFile, resultFilePath);
-							  System.out.println("continue"); 
+							  encryptFile.EncryptFile(jtf_key.getText(), sourceFile, outputFilePathSingle);
+							  
+							  timer.start(); //calculate the size of file
+							
+							  Timer timer2 = new Timer(100, new ActionListener() {
+								  @Override
+								  public void actionPerformed(ActionEvent arg0) {
+									  System.out.println("second timer");
+									  if(encryptFile.threadIsAlive() == false) {
+										  timer.stop();
+										  ((Timer)arg0.getSource()).stop();
+										  JOptionPane.showMessageDialog(null, "File was encrypted!");
+									  }
+								  }
+								});
+							  timer2.start();
 						  }
 						  catch(NullPointerException e){ 
 							  System.out.println("NullPointerException: " + e);
@@ -146,6 +185,16 @@ public class TabEncryptFiles extends JPanel {
 					 
 				}
 			});
+		/*new java.util.Timer().schedule( 
+		        new java.util.TimerTask() {
+		            @Override
+		            public void run() {
+		                System.out.println("every 5 seconds");
+		            }
+		        }, 
+		        5000 
+		);*/
+	
 		btn_decrypt_file.addActionListener(new ActionListener()
 		{
 			@Override
@@ -182,11 +231,12 @@ public class TabEncryptFiles extends JPanel {
 		
 		gbc.gridx = 2;
 		gbc.gridy = 0;
-		gbc.gridheight = 3;
+		gbc.gridheight = 2;
 		add(panelEncrypt, gbc);
 		
 		gbc.gridx = 2;
-		gbc.gridy = 3;
+		gbc.gridy = 5;
+		gbc.gridheight = 2;
 		add(panelDecrypt, gbc); 
 		
 		gbc.gridx = 0;
@@ -201,5 +251,9 @@ public class TabEncryptFiles extends JPanel {
 		gbc.gridy = 1;
 		add(checkBoxArchive, gbc); 
 		
+		gbc.gridx = 2;
+		gbc.gridy = 3;
+		gbc.gridwidth = 2;
+		add(progressBar, gbc); 
 	}
 }
