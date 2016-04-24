@@ -42,6 +42,7 @@ public class TabEncryptFiles extends JPanel {
 	
 	private File sourceFileSingle;
 	private String outputFilePathSingle = "";
+	private  Encrypt encryptFile;
 	public TabEncryptFiles() {
 		
 		setLayout(new GridBagLayout());
@@ -133,12 +134,13 @@ public class TabEncryptFiles extends JPanel {
 		 Timer timer = new Timer(100, new ActionListener() {
 			  @Override
 			  public void actionPerformed(ActionEvent arg0) {
-				//  sourceFilePathSingle.length()
-			        File fs = new File(outputFilePathSingle);
+			       File fs = new File(outputFilePathSingle);
 				long value1 = (fs.length() * 100) / sourceFileSingle.length();
-			    //    long size = fs.getFileSize("myFile.txt");
-				  System.out.println("result file Size: " +  fs.length());
 				  progressBar.setValue((int) value1);
+				  if(encryptFile.threadIsAlive() == false) {
+					  ((Timer)arg0.getSource()).stop();
+					  JOptionPane.showMessageDialog(null, "File was encrypted!!!");
+				  }
 			  }
 			});
 		btn_encrypt_file.addActionListener(new ActionListener()
@@ -160,23 +162,9 @@ public class TabEncryptFiles extends JPanel {
 					 if(sourceFile != null && outputFilePathSingle != null) {
 						 try
 						  {
-							  Encrypt encryptFile = new Encrypt(jtf_key.getText());
+							  encryptFile = new Encrypt(jtf_key.getText());
 							  encryptFile.EncryptFile(jtf_key.getText(), sourceFile, outputFilePathSingle);
-							  
 							  timer.start(); //calculate the size of file
-							
-							  Timer timer2 = new Timer(100, new ActionListener() {
-								  @Override
-								  public void actionPerformed(ActionEvent arg0) {
-									  System.out.println("second timer");
-									  if(encryptFile.threadIsAlive() == false) {
-										  timer.stop();
-										  ((Timer)arg0.getSource()).stop();
-										  JOptionPane.showMessageDialog(null, "File was encrypted!");
-									  }
-								  }
-								});
-							  timer2.start();
 						  }
 						  catch(NullPointerException e){ 
 							  System.out.println("NullPointerException: " + e);
@@ -185,16 +173,6 @@ public class TabEncryptFiles extends JPanel {
 					 
 				}
 			});
-		/*new java.util.Timer().schedule( 
-		        new java.util.TimerTask() {
-		            @Override
-		            public void run() {
-		                System.out.println("every 5 seconds");
-		            }
-		        }, 
-		        5000 
-		);*/
-	
 		btn_decrypt_file.addActionListener(new ActionListener()
 		{
 			@Override
