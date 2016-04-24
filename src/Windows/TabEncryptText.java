@@ -1,5 +1,6 @@
 package Windows;
 
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
@@ -100,6 +101,7 @@ public class TabEncryptText extends JPanel {
 			{
 				public void actionPerformed(ActionEvent arg0) {
 					JFileChooser fileChooser = new JFileChooser(System.getProperty("user.dir"));
+					fileChooser.setPreferredSize(new Dimension(1000, 600));
 					if (fileChooser.showOpenDialog(open_file) == JFileChooser.APPROVE_OPTION) {
 						  File file = fileChooser.getSelectedFile();
 						  pathOriginalImage = file.getPath();
@@ -162,6 +164,7 @@ public class TabEncryptText extends JPanel {
 	{
 		public void actionPerformed(ActionEvent arg0) {
 			JFileChooser fileChooser = new JFileChooser(System.getProperty("user.dir"));
+			fileChooser.setPreferredSize(new Dimension(1000, 600));
 			fileChooser.setAcceptAllFileFilterUsed(false);
 			if (fileChooser.showOpenDialog(open_file) == JFileChooser.APPROVE_OPTION) {
 			  File file = fileChooser.getSelectedFile();

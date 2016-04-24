@@ -5,13 +5,16 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Decrypt extends AES implements Runnable {
 	private String source_text =  "";
 	private  byte Round[][][] = new byte[11][4][4];
 	private Thread thread;
-	private File sourceFilePrivate;
-	private String outputPathPrivate;
+	private List<File> sourceFilesList = new ArrayList<File>();
+	private List<String> outputPathList = new ArrayList<String>();
+	private long CommonSizeOfFiles = 0;
 	public String get_text()
 	{
 		return source_text;
@@ -93,15 +96,23 @@ public class Decrypt extends AES implements Runnable {
 			}
 		}
 	}
+	public void DecryptGroupsOfFiles(List<File> sourceFile, List<String> outputPath)
+	{
+		sourceFilesList = sourceFile;
+		outputPathList = outputPath;
+		thread = new Thread(this, "Decryption files");
+		thread.start();
+	}
 	public void DecryptFile(File sourceFile, String pathOutput)
 	{
-		sourceFilePrivate = sourceFile;
-		outputPathPrivate = pathOutput;
+		sourceFilesList.add(sourceFile);
+		outputPathList.add(pathOutput);
 		thread = new Thread(this, "Decryption file");
 		thread.start();
 	}
 	public Decrypt(String key){
 		initRoundKey(key);
+		CommonSizeOfFiles = 0;
 	}
     public  void convertToHex(File file, String pathNew) throws IOException {
 		InputStream is = new FileInputStream(file);
@@ -151,12 +162,13 @@ public class Decrypt extends AES implements Runnable {
 		 fos.close();
 	     is.close();
 	  }
-    public static void WriteFile(FileOutputStream fos, byte[] arrayBytes) throws IOException
+    public void WriteFile(FileOutputStream fos, byte[] arrayBytes) throws IOException
   	{
   		for(int i = 0; i < 16; i++)
   		{
   			fos.write(arrayBytes[i]);
   		}
+  		CommonSizeOfFiles +=  arrayBytes.length; 
   	}
 	private byte[][] getBlock4_4(byte[] cipher_code, int index1, int index2)
 	{
@@ -183,14 +195,19 @@ public class Decrypt extends AES implements Runnable {
 	}
 	@Override
 	public void run() {
-		try
-		{
-			convertToHex(sourceFilePrivate, outputPathPrivate);
-		}
-		catch(IOException e){
+		for(int i = 0; i < sourceFilesList.size(); i++) {
+			try
+			{
+				convertToHex(sourceFilesList.get(i), outputPathList.get(i));
+			}
+			catch(IOException e){
+			}
 		}
 	}
 	public Boolean threadIsAlive() {
 		return thread.isAlive();
+	}
+	public long getCommonSizeOfFiles() {
+		return CommonSizeOfFiles;
 	}
 }

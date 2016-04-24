@@ -46,6 +46,7 @@ public class TabEncryptFiles extends JPanel {
 		
 	    JProgressBar progressBar = new JProgressBar();
 	    progressBar.setStringPainted(true);
+	    progressBar.setPreferredSize(new Dimension(240, 40));
 	    progressBar.setMinimum(0);
 	    progressBar.setMaximum(100);
 	    Border border = BorderFactory.createTitledBorder("Encryption...");
@@ -134,7 +135,7 @@ public class TabEncryptFiles extends JPanel {
 						 try
 						  {
 							  encryptFile = new Encrypt(jtf_key.getText());
-							  encryptFile.EncryptFile(sourceFile, fileOutput.getPath());
+							  encryptFile.EncryptFile(sourceFile, fileOutput.getPath()+ "_encrypted.png");
 							  timer.start(); 
 						  }
 						  catch(NullPointerException e){ 
@@ -153,8 +154,8 @@ public class TabEncryptFiles extends JPanel {
 		gbc.gridy = 0;
 		add(jtf_key, gbc);
 		
-		gbc.gridx = 2;
-		gbc.gridy = 0;
+		gbc.gridx = 1;
+		gbc.gridy = 1;
 		gbc.gridheight = 2;
 		add(panelEncrypt, gbc);
 				
@@ -166,7 +167,7 @@ public class TabEncryptFiles extends JPanel {
 		gbc.gridy = 1;
 		add(checkBoxArchive, gbc); 
 		
-		gbc.gridx = 2;
+		gbc.gridx = 1;
 		gbc.gridy = 3;
 		gbc.gridwidth = 2;
 		add(progressBar, gbc); 
