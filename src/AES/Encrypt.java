@@ -6,14 +6,15 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.List;
 
 public class Encrypt extends AES implements Runnable {
 	Thread thread;
 	private String cipherTextBase64 = "";
 	private byte Round[][][] = new byte[11][4][4];
 	private ArrayList<Byte> arrayListBytes = new ArrayList<Byte>();
-	private File sourceFilePrivate;
-	private String outputFilePrivate;
+	private List<File> sourceFilesList = new ArrayList<File>();
+	private List<String> outputPathsList = new ArrayList<String>();
 	private void initRoundKey(String str_key)
 	{
 		byte cipher[][] = new byte[4][4];
@@ -88,13 +89,21 @@ public class Encrypt extends AES implements Runnable {
 				Encrypt_block(toHex(str_plain_text.substring(i, i+r)), "string");
 			}
 		}
-	}
-	public void EncryptFile(String key, File sourceFile, String outputFile)
+	} 
+	public void EncryptGroupsOfFiles(List<File> sourceFile, List<String> outputPath)
 	{
-		sourceFilePrivate = sourceFile;
-		outputFilePrivate = outputFile;
+		this.sourceFilesList = sourceFile;
+		this.outputPathsList = outputPath;
 		thread = new Thread(this, "Encryption file");
-		System.out.println("new thread was created " + thread );
+		System.out.println("new thread for multiple files was created " + thread );
+		thread.start();
+	}
+	public void EncryptFile(File sourceFile, String outputFile)
+	{
+		sourceFilesList.add(sourceFile);
+		outputPathsList.add(outputFile);
+		thread = new Thread(this, "Encryption file");
+		System.out.println("new thread for one file was created " + thread );
 		thread.start();
 	}
 	public Encrypt(String key){
@@ -166,12 +175,13 @@ public class Encrypt extends AES implements Runnable {
 	}
 	@Override
 	public void run() {
-		try
+		for(int i = 0; i < sourceFilesList.size(); i++)
 		{
-			convertToHex(sourceFilePrivate, outputFilePrivate);
-		}
-		catch(IOException e){
-			
+			try {
+				convertToHex(sourceFilesList.get(i), outputPathsList.get(i));
+			}
+			catch(IOException e){
+			}
 		}
 	}
 	public Boolean threadIsAlive() {

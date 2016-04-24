@@ -89,7 +89,7 @@ public class TabEncryptText extends JPanel {
 			{
 				String plain_text = jtf_ciphertext.getText();
 				Decrypt decrypt = new Decrypt(jtf_key.getText());
-				decrypt.DecryptText(plain_text, jtf_key.getText());
+				decrypt.DecryptText(plain_text);
 				cipherTextArea.setText("");
 				cipherTextArea.setText(decrypt.get_text());
 			}

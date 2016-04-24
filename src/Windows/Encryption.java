@@ -18,6 +18,7 @@ public class Encryption  {
 	
 		tabbedPane.addTab("Encrypt text", new TabEncryptText(frame.getLocation().x, frame.getLocation().y));
 		tabbedPane.addTab("Encrypt files", new TabEncryptFiles());
+		tabbedPane.addTab("Decrypt files", new TabDecryptFiles());
 		
 		frame.add(tabbedPane);
 		frame.setVisible(true);

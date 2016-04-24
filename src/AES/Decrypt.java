@@ -6,9 +6,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class Decrypt extends AES {
+public class Decrypt extends AES implements Runnable {
 	private String source_text =  "";
 	private  byte Round[][][] = new byte[11][4][4];
+	private Thread thread;
+	private File sourceFilePrivate;
+	private String outputPathPrivate;
 	public String get_text()
 	{
 		return source_text;
@@ -29,7 +32,7 @@ public class Decrypt extends AES {
 			Round[i] = get_cipher(cipher, RC[i-1]);
 		}
 	}
-	private byte[] Decrypt_block(byte[][] block_16, String str_key, String typeDecryption)
+	private byte[] Decrypt_block(byte[][] block_16, String typeDecryption)
 	{
 		byte plain_text[][] = new byte[4][4];
 		for(int i = 0; i < 4; i++)
@@ -69,7 +72,7 @@ public class Decrypt extends AES {
 		}
 		return decryptedText;
 	}
-	public void DecryptText(String str_plain_text, String str_key)
+	public void DecryptText(String str_plain_text)
 	{
 		source_text = "";
 		byte byteList[] = Base64ToByte(str_plain_text);
@@ -81,30 +84,26 @@ public class Decrypt extends AES {
 			if(r >= 16)
 			{
 				block16 = getBlock4_4(byteList, i, i+16);
-				Decrypt_block(block16, str_key, "string");
+				Decrypt_block(block16, "string");
 			}
 			else
 			{
 				block16 = getBlock4_4(byteList, i, i+r);
-				Decrypt_block(block16, str_key, "string");
+				Decrypt_block(block16, "string");
 			}
 		}
 	}
-	public void DecryptFile(String key, File sourceFile, String pathOutput)
+	public void DecryptFile(File sourceFile, String pathOutput)
 	{
-		try
-		{
-			convertToHex(key, sourceFile, pathOutput);
-		}
-		catch(IOException e)
-		{
-			
-		}
+		sourceFilePrivate = sourceFile;
+		outputPathPrivate = pathOutput;
+		thread = new Thread(this, "Decryption file");
+		thread.start();
 	}
 	public Decrypt(String key){
 		initRoundKey(key);
 	}
-    public  void convertToHex(String key, File file, String pathNew) throws IOException {
+    public  void convertToHex(File file, String pathNew) throws IOException {
 		InputStream is = new FileInputStream(file);
 		FileOutputStream fos = new FileOutputStream(pathNew);
 		int bytesCounter = 0;		
@@ -123,7 +122,7 @@ public class Decrypt extends AES {
 				j++;
 			    if(bytesCounter==15) {
 			    	tempBytes = getBlock4_4(currentBytes, 16);
-			    	decryptedBytes = Decrypt_block(tempBytes, key, "file");
+			    	decryptedBytes = Decrypt_block(tempBytes, "file");
 			       	WriteFile(fos, decryptedBytes);
 			       	bytesCounter=0;
 			       	j = 0;
@@ -146,7 +145,7 @@ public class Decrypt extends AES {
 	       		decryptedBytes[i] = 0;
 	       	}
 			tempBytes = getBlock4_4(currentBytes, 16);
-			decryptedBytes = Decrypt_block(tempBytes, key, "file");
+			decryptedBytes = Decrypt_block(tempBytes, "file");
 		  	WriteFile(fos, decryptedBytes);
 	    }
 		 fos.close();
@@ -181,5 +180,17 @@ public class Decrypt extends AES {
 			}
 		}
 		return tmp;
+	}
+	@Override
+	public void run() {
+		try
+		{
+			convertToHex(sourceFilePrivate, outputPathPrivate);
+		}
+		catch(IOException e){
+		}
+	}
+	public Boolean threadIsAlive() {
+		return thread.isAlive();
 	}
 }
