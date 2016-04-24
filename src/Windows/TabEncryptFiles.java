@@ -17,6 +17,7 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -33,6 +34,7 @@ public class TabEncryptFiles extends JPanel {
 	private GridBagConstraints gbc ;
 	private JButton open_file = new JButton("Open file to decrypt");
 	private JLabel str_key = new JLabel("Key");
+	private JCheckBox checkBoxArchive = new JCheckBox("Save files to archive");
 	public TabEncryptFiles() {
 		
 		setLayout(new GridBagLayout());
@@ -93,10 +95,10 @@ public class TabEncryptFiles extends JPanel {
 			                    f.showSaveDialog(null);
 			                   if(f.getSelectedFile() != null)
 			                   {
-			                	   for (File file : droppedFiles) {
-					                	Encrypt encryptFile = new Encrypt(jtf_key.getText());
-					                  encryptFile.EncryptFile(jtf_key.getText(), file, f.getSelectedFile() + "/" + file.getName() + "_encrypted.png");
-					                  //Waiting when previous file will be encrypted
+			                	   for (File file : droppedFiles) 
+			                	   {
+					                	Decrypt decryptFile = new Decrypt(jtf_key.getText());
+					                	decryptFile.DecryptFile(jtf_key.getText(), file, f.getSelectedFile() + "/" + file.getName());
 					                }
 			                   }
 			          } catch (Exception ex) {
@@ -130,17 +132,19 @@ public class TabEncryptFiles extends JPanel {
 				  		    File file = fileChooser.getSelectedFile();
 				  		  resultFilePath = file.getPath();
 				        }
-					  try
-					  {
-						  Encrypt encryptFile = new Encrypt(jtf_key.getText());
-						  encryptFile.EncryptFile(jtf_key.getText(), sourceFile, resultFilePath);
-						  System.out.println("continue"); 
-					  }
-					  catch(NullPointerException e){ 
-						  System.out.println("NullPointerException: " + e);
-					  }
+					 if(sourceFile != null && resultFilePath != null) {
+						 try
+						  {
+							  Encrypt encryptFile = new Encrypt(jtf_key.getText());
+							  encryptFile.EncryptFile(jtf_key.getText(), sourceFile, resultFilePath);
+							  System.out.println("continue"); 
+						  }
+						  catch(NullPointerException e){ 
+							  System.out.println("NullPointerException: " + e);
+						  }
+					 }
+					 
 				}
-		
 			});
 		btn_decrypt_file.addActionListener(new ActionListener()
 		{
@@ -193,6 +197,9 @@ public class TabEncryptFiles extends JPanel {
 		gbc.gridy = 1;
 		add(btn_decrypt_file, gbc); 
 		
+		gbc.gridx = 3;
+		gbc.gridy = 1;
+		add(checkBoxArchive, gbc); 
 		
 	}
 }

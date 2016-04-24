@@ -13,8 +13,6 @@ public class Encrypt extends AES implements Runnable {
 	private String cipherTextBase64 = "";
 	private byte Round[][][] = new byte[11][4][4];
 	private ArrayList<Byte> arrayListBytes = new ArrayList<Byte>();
-	///////////
-	private String keyPrivate; 
 	private File sourceFilePrivate;
 	private String outputFilePrivate;
 	private void initRoundKey(String str_key)
@@ -33,7 +31,7 @@ public class Encrypt extends AES implements Runnable {
 			Round[i] = get_cipher(cipher, RC[i-1]);
 		}
 	}
-	private byte[] Encrypt_block(byte[][] plain_text,  String str_key, String typeEncryption)
+	private byte[] Encrypt_block(byte[][] plain_text, String typeEncryption)
 	{
 		//show(plain_text);
 		XOR(plain_text, Round[0]);
@@ -48,7 +46,6 @@ public class Encrypt extends AES implements Runnable {
 		SubBytes(plain_text, false);
 		ShiftRows(plain_text, false);
 		XOR(plain_text, Round[10]);
-		//show(plain_text);
 		//write_to_file(plain_text, "D:/ciphertext.txt");
 		
 		byte[] ciphertextBytes = new byte[16];
@@ -76,7 +73,7 @@ public class Encrypt extends AES implements Runnable {
 		}
 		return ciphertextBytes;
 	}
-	public void EncryptText(String str_plain_text, String str_key)
+	public void EncryptText(String str_plain_text)
 	{
 		int r = 0;
 		cipherTextBase64 = "";
@@ -85,17 +82,16 @@ public class Encrypt extends AES implements Runnable {
 			r = str_plain_text.length() - i;
 			if(r >= 16)
 			{
-				Encrypt_block(toHex(str_plain_text.substring(i, i+16)), str_key, "string");
+				Encrypt_block(toHex(str_plain_text.substring(i, i+16)), "string");
 			}
 			else
 			{
-				Encrypt_block(toHex(str_plain_text.substring(i, i+r)), str_key, "string");
+				Encrypt_block(toHex(str_plain_text.substring(i, i+r)), "string");
 			}
 		}
 	}
 	public void EncryptFile(String key, File sourceFile, String outputFile)
 	{
-		keyPrivate = key;
 		sourceFilePrivate = sourceFile;
 		outputFilePrivate = outputFile;
 		thread = new Thread(this, "Encryption file");
@@ -105,7 +101,7 @@ public class Encrypt extends AES implements Runnable {
 	public Encrypt(String key){
 		initRoundKey(key);
 	}
-    public  void convertToHex(String key, File file, String pathNew) throws IOException {
+    public  void convertToHex(File file, String pathNew) throws IOException {
 		InputStream is = new FileInputStream(file);
 		FileOutputStream fos = new FileOutputStream(pathNew);	
 		int value = 0;
@@ -128,7 +124,7 @@ public class Encrypt extends AES implements Runnable {
 			j++;
 		    if(bytesCounter==15) {
 		    	block4_4 = getBlock4_4(currentBytes, 16);
-		    	encryptedBytes = Encrypt_block(block4_4, key, "file");
+		    	encryptedBytes = Encrypt_block(block4_4, "file");
 		       	WriteFile(fos, encryptedBytes);
 		       	bytesCounter=0;
 		       	j = 0;
@@ -146,7 +142,7 @@ public class Encrypt extends AES implements Runnable {
 		if(bytesCounter != 0)
 		{	
 			block4_4 = getBlock4_4(currentBytes, 16);
-			encryptedBytes = Encrypt_block(block4_4, key, "file");
+			encryptedBytes = Encrypt_block(block4_4, "file");
 		  	WriteFile(fos, encryptedBytes);
 	    }
 			fos.close();
@@ -173,7 +169,7 @@ public class Encrypt extends AES implements Runnable {
 	public void run() {
 		try
 		{
-			convertToHex(keyPrivate, sourceFilePrivate, outputFilePrivate);
+			convertToHex(sourceFilePrivate, outputFilePrivate);
 		}
 		catch(IOException e)
 		{

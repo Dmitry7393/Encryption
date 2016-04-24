@@ -26,7 +26,7 @@ import AES.Encrypt;
 import Image.DecryptFromImage;
 import Image.EncryptInImage;
 
-public class EncryptTextPanel extends JPanel {
+public class TabEncryptText extends JPanel {
 	private static final long serialVersionUID = 1L;
 	private JButton btn_encrypt = new JButton("Encrypt");
 	private JButton btn_decrypt = new JButton("Decrypt");
@@ -47,7 +47,7 @@ public class EncryptTextPanel extends JPanel {
 	private  JLabel picLabel_decrypted = new JLabel();
 	private JButton open_file = new JButton("Open file to decrypt");
 	
-	EncryptTextPanel(int frameLocationX, int frameLocationY) {
+	TabEncryptText(int frameLocationX, int frameLocationY) {
 		setLayout(new GridBagLayout());
 		plainTextArea.setText("Two One Nine Two");
 		 
@@ -73,7 +73,7 @@ public class EncryptTextPanel extends JPanel {
 				String str_plain_text = plainTextArea.getText();
 				String str_key = jtf_key.getText();
 				Encrypt encrText = new Encrypt(str_key);
-				encrText.EncryptText(str_plain_text, str_key);
+				encrText.EncryptText(str_plain_text);
 				String cipher_text = encrText.getCipherText();
 				jtf_ciphertext.setText(cipher_text);
 			}

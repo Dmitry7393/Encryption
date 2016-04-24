@@ -16,7 +16,7 @@ public class Encryption  {
 		
 	    JTabbedPane tabbedPane = new JTabbedPane();
 	
-		tabbedPane.addTab("Encrypt text", new EncryptTextPanel(frame.getLocation().x, frame.getLocation().y));
+		tabbedPane.addTab("Encrypt text", new TabEncryptText(frame.getLocation().x, frame.getLocation().y));
 		tabbedPane.addTab("Encrypt files", new TabEncryptFiles());
 		
 		frame.add(tabbedPane);
