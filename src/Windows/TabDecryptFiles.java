@@ -57,8 +57,8 @@ public class TabDecryptFiles extends JPanel {
 			Timer timer = new Timer(100, new ActionListener() {
 				  @Override
 				  public void actionPerformed(ActionEvent arg0) {
-					long value1 = (100 * decryptFile.getCommonSizeOfFiles()) / sizeOfSourceFiles ;
-					  progressBar.setValue((int) value1);
+					long valuePercent = (100 * decryptFile.getCommonSizeOfFiles()) / sizeOfSourceFiles ;
+					  progressBar.setValue((int) valuePercent);
 					  if(decryptFile.threadIsAlive() == false) {
 						  ((Timer)arg0.getSource()).stop();
 						  JOptionPane.showMessageDialog(null, "File was decrypted!!!");

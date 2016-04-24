@@ -55,8 +55,8 @@ public class TabEncryptFiles extends JPanel {
 		 Timer timer = new Timer(100, new ActionListener() {
 			  @Override
 			  public void actionPerformed(ActionEvent arg0) {
-				long value1 = (100 * encryptFile.getCommonSizeOfFiles()) / sizeOfSourceFiles ;
-				  progressBar.setValue((int) value1);
+				long valuePercent = (100 * encryptFile.getCommonSizeOfFiles()) / sizeOfSourceFiles ;
+				  progressBar.setValue((int) valuePercent);
 				  if(encryptFile.threadIsAlive() == false) {
 					  ((Timer)arg0.getSource()).stop();
 					  JOptionPane.showMessageDialog(null, "File was encrypted!!!");
@@ -80,6 +80,7 @@ public class TabEncryptFiles extends JPanel {
 			                evt.acceptDrop(DnDConstants.ACTION_COPY);
 			                @SuppressWarnings("unchecked")
 			                List<File> droppedFiles = (List<File>)evt.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
+			                sizeOfSourceFiles = 0; 
 			                JFileChooser f = new JFileChooser();
 			                f.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY); 
 			                f.showSaveDialog(null);
@@ -104,8 +105,6 @@ public class TabEncryptFiles extends JPanel {
 			  });
 		panelEncrypt.setBorder(BorderFactory.createLineBorder(Color.RED, 2, true));
 				
-
-	    
 	    gbc = new GridBagConstraints();
 	    gbc.insets = new Insets(0,20,20,0);
 	    gbc.anchor = GridBagConstraints.NORTHWEST;
@@ -120,7 +119,7 @@ public class TabEncryptFiles extends JPanel {
 				public void actionPerformed(ActionEvent arg0) {
 					File sourceFile = null;
 					File fileOutput = null;
-					
+					sizeOfSourceFiles = 0; 
 					JFileChooser fileChooser = new JFileChooser(System.getProperty("user.dir"));
 					fileChooser.setPreferredSize(new Dimension(1000, 600)); 
 					
