@@ -38,6 +38,8 @@ public class AES {
 				0xa9, 0x19, 0xb5, 0x4a, 0x0d, 0x2d, 0xe5, 0x7a, 0x9f, 0x93, 0xc9, 0x9c, 0xef, 0xa0, 0xe0, 0x3b, 0x4d, 0xae,
 				0x2a, 0xf5, 0xb0, 0xc8, 0xeb, 0xbb, 0x3c, 0x83, 0x53, 0x99, 0x61, 0x17, 0x2b, 0x04, 0x7e, 0xba, 0x77, 0xd6,
 				0x26, 0xe1, 0x69, 0x14, 0x63, 0x55, 0x21, 0x0c, 0x7d };
+		private byte[][] mRoundKeys;
+		private int countRoundKeys;
 	protected static void XOR(byte matrix1[][], byte matrix2[][])
 	{
 		for(int i = 0; i < 4; i++)
@@ -83,9 +85,9 @@ public class AES {
 	protected static void show(byte[][] plain_text)
 	 {
 		 StringBuffer strBuffer = new StringBuffer();
-			for(int i = 0; i < 4; i++)
+			for(int j = 0; j < 4; j++)
 			{
-				for(int j = 0; j < 4; j++)
+				for(int i = 0; i < 4; i++)
 				{
 					strBuffer.setLength(0);
 					strBuffer.append(Long.toHexString(plain_text[i][j]).toUpperCase());
@@ -93,20 +95,21 @@ public class AES {
 					System.out.print(strBuffer + " ");
 					strBuffer.setLength(0);
 				}
-				System.out.println("");
 			}
+			System.out.println("");
 	 }
-	/* private static void show2(byte[] plain_text)
+	 private static void show2(byte[] plain_text)
 	 {
 		 StringBuffer strBuffer = new StringBuffer();
-			for(int i = 0; i < 4; i++)
+			for(int i = 0; i < plain_text.length; i++)
 			{
 					strBuffer.setLength(0);
 					strBuffer.append(Long.toHexString(plain_text[i]).toUpperCase());
 					System.out.print(strBuffer + " ");
 					strBuffer.setLength(0);
 			}
-	 }*/
+			System.out.println("");
+	 }
 	 private static byte[] XOR2(byte[] w, byte[] gw)
 	 {
 		 byte temp[] = new byte[4];
@@ -115,55 +118,6 @@ public class AES {
 			 temp[i] = (byte) (w[i] ^ gw[i]);
 		 }
 		 return temp;
-	 }
-	 protected static byte[][] get_cipher(byte[][] cipher, byte round_constant)
-	 {
-		 byte[] w0 = new byte[] {cipher[0][0], cipher[1][0], cipher[2][0], cipher[3][0]};
-		
-		 //System.out.println(" _______________ ");
-		 byte[] w1 = new byte[] {cipher[0][1], cipher[1][1], cipher[2][1], cipher[3][1]};
-		 byte[] w2 = new byte[] {cipher[0][2], cipher[1][2], cipher[2][2], cipher[3][2]};
-		 byte[] w3 = new byte[] {cipher[0][3], cipher[1][3], cipher[2][3], cipher[3][3]};
-		 
-		 //byte temp = w3[0];
-		 byte[] gw3 = new byte[] {w3[1], w3[2], w3[3], w3[0] };
-		 SubBytes2(gw3, false);
-		 
-		 gw3[0] ^= round_constant;
-		 
-		 byte w4[] = new byte[4];
-		 w4 = XOR2(w0, gw3);
-		 
-		 byte w5[] = new byte[4];
-		 w5 = XOR2(w4, w1);
-	
-		 byte w6[] = new byte[4];
-		 w6 = XOR2(w5, w2);
-		 
-		 byte w7[] = new byte[4];
-		 w7 = XOR2(w6, w3);
-		 byte Round[][] = new byte[4][4];
-		 for(int i = 0; i < 4; i++)
-		 {
-			 cipher[i][0] = w4[i];
-			 Round[i][0] = w4[i];
-		 }
-		 for(int i = 0; i < 4; i++)
-		 {
-			 cipher[i][1] = w5[i];
-			 Round[i][1] = w5[i];
-		 }
-		 for(int i = 0; i < 4; i++)
-		 {
-			 cipher[i][2] = w6[i];
-			 Round[i][2] = w6[i];
-		 }
-		 for(int i = 0; i < 4; i++)
-		 {
-			 cipher[i][3] = w7[i];
-			 Round[i][3] = w7[i];
-		 }
-		return Round;
 	 }
 	// Multiplication function over GF(2^8) used in the MixColumns pass
 		public static byte GFMult(byte a, byte b) {
@@ -214,7 +168,22 @@ public class AES {
 			}
 			return str;
 		}
-	    protected static byte[][] toHex(String text) //16 byte
+	    protected  byte[] StringKeyToHex(String text, int keySize) //16 byte
+	    {
+	        byte temp[] = new byte[keySize];
+	        String convert ;
+	        int k = 0;
+	        for(int i = 0; i < text.length(); i++)
+	        {
+	            char c = text.charAt(i);
+	            int ascii = (int) c;
+	            convert = Integer.toHexString(ascii);
+	            temp[k] = (byte)Integer.parseInt(convert, 16);
+	            k++;
+	        }
+	        return temp;
+	    }
+	    protected byte[][] getBlock16(String text) //16 byte
 	    {
 	        byte temp[][] = new byte[4][4];
 	        String convert ;
@@ -255,6 +224,73 @@ public class AES {
 			            System.out.println(ex.getMessage());
 			        } 
 		}
+	    private byte[] generateRoundKeys(byte[] cipher, int keySize, int NB, int Nk, int Nr, byte round_constant)
+		 {
+	    	//Nk can be 4, 6, 8
+			byte[][] w = new byte[Nk][4];
+			int wIndex = 0;
+			for(int i = 0; i < cipher.length; i+=Nk) {
+				for(int j = 0; j < Nk; j++) {
+				   w[wIndex][j] = cipher[i+j];
+				}
+				wIndex++;
+			}
+			byte[] gwLast = new byte[] {w[3][1], w[3][2], w[3][3], w[3][0] };	
+			SubBytes2(gwLast, false);
+			gwLast[0] ^= round_constant;
+					
+			//Nk = 4
+			byte[][] wNew = new byte[Nk][4];
+			wIndex = 0;
+			for(int i = 0; i < Nk; i++) {
+				if(i == 0) {
+				   wNew[wIndex] = XOR2(w[i], gwLast);
+				} else {
+				   wNew[wIndex] = XOR2(wNew[i-1], w[i]);
+				}
+				wIndex++;
+			}
+			/*for(int i = 0; i < Nk; i++) {
+				mRoundKeys[countRoundKeys] = wNew[i];
+				countRoundKeys++;
+			}	*/	
+			byte keyCurrentRound[] = new byte[keySize];
+			int k = 0;
+			for(int i = 0; i < Nk; i++) {
+				for(int j = 0; j < 4; j++) {
+					keyCurrentRound[k] = wNew[i][j];
+					k++;
+				}
+			}
+			return keyCurrentRound;
+		 }
+	    protected void initRoundKeys(String keyHexString, int keySize, int NB, int Nk, int Nr) {
+	    	mRoundKeys = new byte[Nr+1][NB]; //general array
+	    	countRoundKeys = 0;
+	    	byte keyHex[] = new byte[keySize];
+			keyHex = StringKeyToHex(keyHexString, keySize);
+		/*	// init key for Round 0 
+			for(int i = 0; i < keyHex.length; i += Nk) {
+				for(int j = 0; j < Nk; j++) {
+				   mRoundKeys[countRoundKeys][j] = keyHex[i+j];
+				}
+				countRoundKeys++;
+			}*/
+	    	//last Round keys
+			byte keyHexRound[] = new byte[keySize];
+			//We need keyHexRound to generate new keys which depend on previous
+			keyHexRound = StringKeyToHex(keyHexString, keySize);
+			show2(keyHexRound);
+			for(int i = 1; i < 11; i++) {
+				keyHexRound = generateRoundKeys(keyHexRound, keySize, NB, Nk, Nr, RC[i-1]);
+				show2(keyHexRound);
+			}
+			
+			
+			for(int i = 0; i < countRoundKeys; i++) {
+				show2(mRoundKeys[i]);
+			}	
+	    }
 		protected byte[][] getBlock4_4(byte[] block, int size)
 		{
 			byte temp[][] = new byte[4][4];

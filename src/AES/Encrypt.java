@@ -16,21 +16,13 @@ public class Encrypt extends AES implements Runnable {
 	private List<File> sourceFilesList = new ArrayList<File>();
 	private List<String> outputPathsList = new ArrayList<String>();
 	private long CommonSizeOfFiles = 0;
+	private int keySize = 16;
+	private static final int NB = 4;
+	private int Nk = 4;
+	private int Nr = 10;
 	private void initRoundKey(String str_key)
 	{
-		byte cipher[][] = new byte[4][4];
-		cipher = toHex(str_key);
-		for(int i = 0; i < 4; i++)
-		{
-			for(int j  = 0; j < 4; j++)
-			{
-				Round[0][i][j] = cipher[i][j];
-			}
-		}
-		for(int i = 1; i < 11; i++)
-		{
-			Round[i] = get_cipher(cipher, RC[i-1]);
-		}
+		initRoundKeys(str_key, keySize, NB, Nk, Nr);
 	}
 	private byte[] Encrypt_block(byte[][] plain_text, String typeEncryption)
 	{
@@ -83,11 +75,11 @@ public class Encrypt extends AES implements Runnable {
 			r = str_plain_text.length() - i;
 			if(r >= 16)
 			{
-				Encrypt_block(toHex(str_plain_text.substring(i, i+16)), "string");
+				Encrypt_block(getBlock16(str_plain_text.substring(i, i+16)), "string");
 			}
 			else
 			{
-				Encrypt_block(toHex(str_plain_text.substring(i, i+r)), "string");
+				Encrypt_block(getBlock16(str_plain_text.substring(i, i+r)), "string");
 			}
 		}
 	} 

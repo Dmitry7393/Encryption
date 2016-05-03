@@ -21,7 +21,7 @@ public class Decrypt extends AES implements Runnable {
 	}
 	private void initRoundKey(String str_key)
 	{
-		byte cipher[][] = new byte[4][4];
+		/*byte cipher[][] = new byte[4][4];
 		cipher = toHex(str_key);
 		for(int i = 0; i < 4; i++)
 		{
@@ -33,7 +33,7 @@ public class Decrypt extends AES implements Runnable {
 		for(int i = 1; i < 11; i++)
 		{
 			Round[i] = get_cipher(cipher, RC[i-1]);
-		}
+		}*/
 	}
 	private byte[] Decrypt_block(byte[][] block_16, String typeDecryption)
 	{
