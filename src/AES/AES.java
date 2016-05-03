@@ -98,6 +98,22 @@ public class AES {
 			}
 			System.out.println("");
 	 }
+	protected static void showMatrix(byte[][] plain_text)
+	 {
+		 StringBuffer strBuffer = new StringBuffer();
+			for(int i = 0; i < 4; i++)
+			{
+				for(int j = 0; j < 4; j++)
+				{
+					strBuffer.setLength(0);
+					strBuffer.append(Long.toHexString(plain_text[i][j]).toUpperCase());
+					
+					System.out.print(strBuffer + " ");
+					strBuffer.setLength(0);
+				}
+				System.out.println("");
+			}
+	 }
 	 private static void show2(byte[] plain_text)
 	 {
 		 StringBuffer strBuffer = new StringBuffer();
@@ -229,17 +245,16 @@ public class AES {
 	    	//Nk can be 4, 6, 8
 			byte[][] w = new byte[Nk][4];
 			int wIndex = 0;
-			for(int i = 0; i < cipher.length; i+=Nk) {
-				for(int j = 0; j < Nk; j++) {
+			for(int i = 0; i < keySize; i += NB) { //we choose 4 bytes
+				for(int j = 0; j < 4; j++) {
 				   w[wIndex][j] = cipher[i+j];
 				}
 				wIndex++;
 			}
-			byte[] gwLast = new byte[] {w[3][1], w[3][2], w[3][3], w[3][0] };	
+			byte[] gwLast = new byte[] {w[Nk-1][1], w[Nk-1][2], w[Nk-1][3], w[Nk-1][0]};	
 			SubBytes2(gwLast, false);
-			gwLast[0] ^= round_constant;
-					
-			//Nk = 4
+			gwLast[0] ^= round_constant; //why 0 ?
+
 			byte[][] wNew = new byte[Nk][4];
 			wIndex = 0;
 			for(int i = 0; i < Nk; i++) {
@@ -250,10 +265,12 @@ public class AES {
 				}
 				wIndex++;
 			}
-			/*for(int i = 0; i < Nk; i++) {
+			//General round keys
+			for(int i = 0; i < Nk; i++) {
 				mRoundKeys[countRoundKeys] = wNew[i];
 				countRoundKeys++;
-			}	*/	
+			}	
+			
 			byte keyCurrentRound[] = new byte[keySize];
 			int k = 0;
 			for(int i = 0; i < Nk; i++) {
@@ -264,32 +281,58 @@ public class AES {
 			}
 			return keyCurrentRound;
 		 }
-	    protected void initRoundKeys(String keyHexString, int keySize, int NB, int Nk, int Nr) {
-	    	mRoundKeys = new byte[Nr+1][NB]; //general array
+	    protected byte[][][] initRoundKeys(String keyHexString, int keySize, int NB, int Nk, int Nr) {
+	    	int lengthRoundKeys = (Nr+1)*4;
+	    	if(Nk == 6) 
+	    		lengthRoundKeys = (Nr+1)*4 + 2;
+	    	mRoundKeys = new byte[lengthRoundKeys][NB]; //general array
 	    	countRoundKeys = 0;
 	    	byte keyHex[] = new byte[keySize];
 			keyHex = StringKeyToHex(keyHexString, keySize);
-		/*	// init key for Round 0 
-			for(int i = 0; i < keyHex.length; i += Nk) {
-				for(int j = 0; j < Nk; j++) {
+	    	// Test for 128 bit key
+	       // byte keyHex[] = new byte[] {0x2b, 0x7e, 0x15, 0x16, 0x28, (byte) 0xae, (byte) 0xd2, (byte) 0xa6, (byte) 0xab, (byte) 0xf7, 0x15, (byte) 0x88, 0x09, (byte) 0xcf, 0x4f, 0x3c };
+	    	
+	    	//Test for 192 bit key
+	    //	byte keyHex[] = new byte[] {(byte) 0x8e, 0x73, (byte) 0xb0, (byte) 0xf7, (byte) 0xda, 0x0e, 0x64, 0x52, (byte) 0xc8, 0x10, (byte) 0xf3, 0x2b, 
+	    	//							(byte) 0x80, (byte) 0x90, 0x79, (byte) 0xe5, 0x62, (byte) 0xf8, (byte) 0xea, (byte) 0xd2, 0x52, 0x2c, 0x6b, 0x7b};
+	    	
+
+			// init key for Round 0 +
+			for(int i = 0; i < keyHex.length; i += NB) { //we choose 4 bytes
+				for(int j = 0; j < NB; j++) {
 				   mRoundKeys[countRoundKeys][j] = keyHex[i+j];
 				}
 				countRoundKeys++;
-			}*/
-	    	//last Round keys
+			}
+			//last Round keys
 			byte keyHexRound[] = new byte[keySize];
-			//We need keyHexRound to generate new keys which depend on previous
-			keyHexRound = StringKeyToHex(keyHexString, keySize);
-			show2(keyHexRound);
-			for(int i = 1; i < 11; i++) {
-				keyHexRound = generateRoundKeys(keyHexRound, keySize, NB, Nk, Nr, RC[i-1]);
-				show2(keyHexRound);
+			for(int i = 0; i < keySize; i++) {
+				keyHexRound[i] = keyHex[i];
 			}
 			
-			
-			for(int i = 0; i < countRoundKeys; i++) {
-				show2(mRoundKeys[i]);
-			}	
+			int countRound = 0;
+			if(Nr == 10) countRound = 11;
+			if(Nr == 12) countRound = 9;
+			//if(Nr == 14)
+			for(int i = 1; i < countRound; i++) {
+				keyHexRound = generateRoundKeys(keyHexRound, keySize, NB, Nk, Nr, RC[i-1]);
+			}
+			byte Round[][][] = new byte[Nr+1][4][4];
+			int i1 = 0; int j1 = 0;
+			int k = 0;
+			for(int i = 0; i < (Nr+1)*4; i++) {
+				i1 = 0;
+				for(int j = 0; j < 4; j++) {
+					Round[k][i1][j1] = mRoundKeys[i][j];
+					i1++; //next row
+				}
+				j1++; //next column
+				if(j1 == 4) {
+					k++;
+					j1 = 0; //again first column
+				}
+			}
+			return Round;
 	    }
 		protected byte[][] getBlock4_4(byte[] block, int size)
 		{

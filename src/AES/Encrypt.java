@@ -11,36 +11,42 @@ import java.util.List;
 public class Encrypt extends AES implements Runnable {
 	Thread thread;
 	private String cipherTextBase64 = "";
-	private byte Round[][][] = new byte[11][4][4];
+	private byte Round[][][];
 	private ArrayList<Byte> arrayListBytes = new ArrayList<Byte>();
 	private List<File> sourceFilesList = new ArrayList<File>();
 	private List<String> outputPathsList = new ArrayList<String>();
 	private long CommonSizeOfFiles = 0;
-	private int keySize = 16;
+	
 	private static final int NB = 4;
-	private int Nk = 4;
-	private int Nr = 10;
-	private void initRoundKey(String str_key)
+	private int keySize;
+	private int Nk;
+	private int Nr;
+	private void initRound(String str_key)
 	{
-		initRoundKeys(str_key, keySize, NB, Nk, Nr);
+		Round = new byte[Nr+1][4][4];
+		Round = initRoundKeys(str_key, keySize, NB, Nk, Nr);
 	}
 	private byte[] Encrypt_block(byte[][] plain_text, String typeEncryption)
 	{
 		//show(plain_text);
 		XOR(plain_text, Round[0]);
-		for(int i = 1; i < 10; i++)
+		showMatrix(Round[0]);
+		System.out.println("_________________________________________");
+		for(int i = 1; i < Nr; i++)
 		{
 			SubBytes(plain_text, false);
 			ShiftRows(plain_text, false);
 			MixColumns(plain_text, false);
 			XOR(plain_text, Round[i]); 
+			showMatrix(Round[i]);
+			System.out.println("_________________________________________");
 		}
 		//AES Round 10 no Mix columns 
 		SubBytes(plain_text, false);
 		ShiftRows(plain_text, false);
-		XOR(plain_text, Round[10]);
+		XOR(plain_text, Round[Nr]);
 		//write_to_file(plain_text, "D:/ciphertext.txt");
-		
+		showMatrix(Round[Nr]);
 		byte[] ciphertextBytes = new byte[16];
 		if(typeEncryption.equals("file"))
 		{
@@ -100,7 +106,22 @@ public class Encrypt extends AES implements Runnable {
 		thread.start();
 	}
 	public Encrypt(String key){
-		initRoundKey(key);
+		if(key.length() <= 16) {
+		     keySize = 16;
+		     Nk = 4;
+		     Nr = 10;
+		}
+		if(key.length() > 16 && key.length() <= 24) {
+		     keySize = 24;
+		     Nk = 6;
+		     Nr = 12;
+		}
+		if(key.length() > 24 && key.length() <= 32) {
+		     keySize = 32;
+		     Nk = 8;
+		     Nr = 14;
+		}
+		initRound(key);
 		CommonSizeOfFiles = 81980;
 	}
     public  void convertToHex(File file, String pathNew) throws IOException {
