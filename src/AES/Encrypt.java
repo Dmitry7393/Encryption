@@ -30,23 +30,18 @@ public class Encrypt extends AES implements Runnable {
 	{
 		//show(plain_text);
 		XOR(plain_text, Round[0]);
-		showMatrix(Round[0]);
-		System.out.println("_________________________________________");
 		for(int i = 1; i < Nr; i++)
 		{
 			SubBytes(plain_text, false);
 			ShiftRows(plain_text, false);
 			MixColumns(plain_text, false);
 			XOR(plain_text, Round[i]); 
-			showMatrix(Round[i]);
-			System.out.println("_________________________________________");
 		}
 		//AES Round 10 no Mix columns 
 		SubBytes(plain_text, false);
 		ShiftRows(plain_text, false);
 		XOR(plain_text, Round[Nr]);
 		//write_to_file(plain_text, "D:/ciphertext.txt");
-		showMatrix(Round[Nr]);
 		byte[] ciphertextBytes = new byte[16];
 		if(typeEncryption.equals("file"))
 		{

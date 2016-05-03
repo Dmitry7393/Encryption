@@ -10,31 +10,26 @@ import java.util.List;
 
 public class Decrypt extends AES implements Runnable {
 	private String source_text =  "";
-	private  byte Round[][][] = new byte[11][4][4];
+	private  byte Round[][][];
 	private Thread thread;
 	private List<File> sourceFilesList = new ArrayList<File>();
 	private List<String> outputPathList = new ArrayList<String>();
 	private long CommonSizeOfFiles = 0;
+	
+	private static final int NB = 4;
+	private int keySize;
+	private int Nk;
+	private int Nr;
+	private void initRound(String str_key)
+	{
+		Round = new byte[Nr+1][4][4];
+		Round = initRoundKeys(str_key, keySize, NB, Nk, Nr);
+	}
 	public String get_text()
 	{
 		return source_text;
 	}
-	private void initRoundKey(String str_key)
-	{
-		/*byte cipher[][] = new byte[4][4];
-		cipher = toHex(str_key);
-		for(int i = 0; i < 4; i++)
-		{
-			for(int j  = 0; j < 4; j++)
-			{
-				Round[0][i][j] = cipher[i][j];
-			}
-		}
-		for(int i = 1; i < 11; i++)
-		{
-			Round[i] = get_cipher(cipher, RC[i-1]);
-		}*/
-	}
+	
 	private byte[] Decrypt_block(byte[][] block_16, String typeDecryption)
 	{
 		byte plain_text[][] = new byte[4][4];
@@ -46,10 +41,10 @@ public class Decrypt extends AES implements Runnable {
 			}
 		}
 		//show(plain_text);
-		XOR(plain_text, Round[10]);
+		XOR(plain_text, Round[Nr]);
 		ShiftRows(plain_text, true);
 		SubBytes(plain_text, true);
-		for(int i = 9; i >= 1; i--)
+		for(int i = Nr-1; i >= 1; i--)
 		{
 			XOR(plain_text, Round[i]);
 			MixColumns(plain_text, true);
@@ -111,7 +106,22 @@ public class Decrypt extends AES implements Runnable {
 		thread.start();
 	}
 	public Decrypt(String key){
-		initRoundKey(key);
+		if(key.length() <= 16) {
+		     keySize = 16;
+		     Nk = 4;
+		     Nr = 10;
+		}
+		if(key.length() > 16 && key.length() <= 24) {
+		     keySize = 24;
+		     Nk = 6;
+		     Nr = 12;
+		}
+		if(key.length() > 24 && key.length() <= 32) {
+		     keySize = 32;
+		     Nk = 8;
+		     Nr = 14;
+		}
+		initRound(key);
 		CommonSizeOfFiles = 0;
 	}
     public  void convertToHex(File file, String pathNew) throws IOException {
