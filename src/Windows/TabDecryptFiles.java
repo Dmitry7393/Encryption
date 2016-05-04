@@ -19,10 +19,12 @@ import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
@@ -34,21 +36,26 @@ import AES.Decrypt;
 
 public class TabDecryptFiles extends JPanel {
 	private static final long serialVersionUID = 1L;
+	private GridBagConstraints gbc;
 
 	private JButton btn_decrypt_file = new JButton("Decrypt file");
 	private JButton btn_decrypt_files = new JButton("Decrypt files");
-	
-	private JTextField jtf_key;
-	private GridBagConstraints gbc;
 	private JButton open_file = new JButton("Open file to decrypt");
+	private JTextField jtf_key;
+
 	private JLabel str_key = new JLabel("Key");
 	private JCheckBox checkBoxArchive = new JCheckBox("Save files to archive");
+	private DefaultListModel<String> defaultListModel = new DefaultListModel<String>();
 
 	private Decrypt decryptFile;
 	private long sizeOfSourceFiles = 0;
+	private List<File> mArrayFiles = new ArrayList<File>();
 
 	public TabDecryptFiles() {
 		setLayout(new GridBagLayout());
+
+		JList<String> filesList = new JList<String>(defaultListModel);
+		filesList.setPreferredSize(new Dimension(240, 100));
 
 		JProgressBar progressBar = new JProgressBar();
 		progressBar.setStringPainted(true);
@@ -90,33 +97,10 @@ public class TabDecryptFiles extends JPanel {
 					@SuppressWarnings("unchecked")
 					List<File> droppedFiles = (List<File>) evt.getTransferable()
 							.getTransferData(DataFlavor.javaFileListFlavor);
-					JFileChooser f = new JFileChooser();
-					f.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-					f.showSaveDialog(null);
-					List<String> outputPaths = new ArrayList<String>();
-					if (f.getSelectedFile() != null) {
-						// Check if some file already exist in that directory
-						boolean allowToSave = true;
-						for (int i = 0; i < droppedFiles.size(); i++) {
-							File tempFile = new File(f.getSelectedFile() + "/" + droppedFiles.get(i).getName());
-							if (tempFile.exists() == true) {
-								allowToSave = false;
-							}
-						}
-						if (allowToSave == true) {
-							for (File file : droppedFiles) {
-								sizeOfSourceFiles = sizeOfSourceFiles + (file.length() - 81980);
-							}
-							for (int i = 0; i < droppedFiles.size(); i++) {
-								outputPaths.add(f.getSelectedFile() + "/" + droppedFiles.get(i).getName());
-							}
-							decryptFile = new Decrypt(jtf_key.getText());
-							decryptFile.DecryptGroupsOfFiles(droppedFiles, outputPaths);
-							timer.start();
-						} else {
-							JOptionPane.showMessageDialog(null, "File already exist in this folder!");
-						}
-
+					for (File file : droppedFiles) {
+						mArrayFiles.add(file);
+						defaultListModel.addElement(file.getName());
+						sizeOfSourceFiles = sizeOfSourceFiles + (file.length() - 81980);
 					}
 				} catch (Exception ex) {
 					ex.printStackTrace();
@@ -168,7 +152,37 @@ public class TabDecryptFiles extends JPanel {
 			}
 
 		});
+		btn_decrypt_files.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				JFileChooser f = new JFileChooser();
+				f.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+				f.showSaveDialog(null);
+				List<String> outputPaths = new ArrayList<String>();
+				if (f.getSelectedFile() != null) {
+					// Check if some file already exist in that directory
+					boolean allowToSave = true;
+					for (int i = 0; i < mArrayFiles.size(); i++) {
+						File tempFile = new File(f.getSelectedFile() + "/" + mArrayFiles.get(i).getName());
+						if (tempFile.exists() == true) {
+							allowToSave = false;
+						}
+					}
+					if (allowToSave == true) {
+						for (int i = 0; i < mArrayFiles.size(); i++) {
+							outputPaths.add(f.getSelectedFile() + "/" + mArrayFiles.get(i).getName());
+						}
+						decryptFile = new Decrypt(jtf_key.getText());
+						decryptFile.DecryptGroupsOfFiles(mArrayFiles, outputPaths);
+						timer.start();
+					} else {
+						JOptionPane.showMessageDialog(null, "File already exist in this folder!");
+					}
 
+				}
+			}
+
+		});
 		gbc.gridx = 0;
 		gbc.gridy = 0;
 		add(str_key, gbc);
@@ -186,13 +200,23 @@ public class TabDecryptFiles extends JPanel {
 		gbc.gridy = 1;
 		add(btn_decrypt_file, gbc);
 
-		gbc.gridx = 3;
-		gbc.gridy = 1;
+		gbc.gridx = 1;
+		gbc.gridy = 3;
 		add(checkBoxArchive, gbc);
 
 		gbc.gridx = 1;
-		gbc.gridy = 3;
+		gbc.gridy = 5;
 		gbc.gridwidth = 2;
 		add(progressBar, gbc);
+
+		gbc.gridx = 2;
+		gbc.gridy = 1;
+		gbc.gridwidth = 2;
+		gbc.gridheight = 2;
+		add(filesList, gbc);
+
+		gbc.gridx = 2;
+		gbc.gridy = 3;
+		add(btn_decrypt_files, gbc);
 	}
 }

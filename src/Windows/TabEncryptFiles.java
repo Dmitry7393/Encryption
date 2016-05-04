@@ -40,6 +40,7 @@ public class TabEncryptFiles extends JPanel {
 	private JButton btn_encrypt_file = new JButton("Encrypt file");
 	private JButton btn_encrypt_files = new JButton("Encrypt files");
 	private JButton open_file = new JButton("Open file to decrypt");
+	private JButton btn_clear_list = new JButton("Clear list");
 
 	private JTextField jtf_key;
 	private GridBagConstraints gbc;
@@ -74,8 +75,8 @@ public class TabEncryptFiles extends JPanel {
 			}
 		});
 		JList<String> filesList = new JList<String>(defaultListModel);
-		filesList.setPreferredSize(new Dimension(240, 100));
-		
+		filesList.setPreferredSize(new Dimension(180, 100));
+
 		JPanel panelEncrypt = new JPanel();
 		panelEncrypt.setLayout(new BoxLayout(panelEncrypt, BoxLayout.X_AXIS));
 
@@ -154,21 +155,34 @@ public class TabEncryptFiles extends JPanel {
 		btn_encrypt_files.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				// Choose directory
-				JFileChooser f = new JFileChooser();
-				f.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-				f.showSaveDialog(null);
+				if (mArrayFiles.size() == 0) {
+					JOptionPane.showMessageDialog(null, "Choose files first");
+				} else {
+					// Choose directory
+					JFileChooser f = new JFileChooser();
+					f.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+					f.showSaveDialog(null);
 
-				List<String> outputPaths = new ArrayList<String>();
+					List<String> outputPaths = new ArrayList<String>();
 
-				if (f.getSelectedFile() != null) {
-					for (int i = 0; i < mArrayFiles.size(); i++) {
-						outputPaths.add(f.getSelectedFile() + "/" + mArrayFiles.get(i).getName() + "_encrypted.png");
+					if (f.getSelectedFile() != null) {
+						for (int i = 0; i < mArrayFiles.size(); i++) {
+							outputPaths
+									.add(f.getSelectedFile() + "/" + mArrayFiles.get(i).getName() + "_encrypted.png");
+						}
 					}
+					encryptFile = new Encrypt(jtf_key.getText());
+					encryptFile.EncryptGroupsOfFiles(mArrayFiles, outputPaths);
+					timer.start();
 				}
-				encryptFile = new Encrypt(jtf_key.getText());
-				encryptFile.EncryptGroupsOfFiles(mArrayFiles, outputPaths);
-				timer.start();
+
+			}
+		});
+		btn_clear_list.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				mArrayFiles.clear();
+				defaultListModel.removeAllElements();
 			}
 		});
 		gbc.gridx = 0;
@@ -205,6 +219,10 @@ public class TabEncryptFiles extends JPanel {
 
 		gbc.gridx = 2;
 		gbc.gridy = 3;
+		add(btn_clear_list, gbc);
+
+		gbc.gridx = 4;
+		gbc.gridy = 5;
 		add(btn_encrypt_files, gbc);
 	}
 }
