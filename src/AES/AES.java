@@ -235,7 +235,7 @@ public class AES {
 				}
 				wIndex++;
 			}
-			byte[] gwLast = new byte[] {w[Nk-1][1], w[Nk-1][2], w[Nk-1][3], w[Nk-1][0]};	
+			byte[] gwLast = new byte[] {w[Nk-1][1], w[Nk-1][2], w[Nk-1][3], w[Nk-1][0]};
 			SubBytes2(gwLast, false);
 			gwLast[0] ^= round_constant; //why 0 ?
 
@@ -269,16 +269,23 @@ public class AES {
 	    	int lengthRoundKeys = (Nr+1)*4;
 	    	if(Nk == 6) 
 	    		lengthRoundKeys = (Nr+1)*4 + 2;
+	       	if(Nk == 8) 
+	    		lengthRoundKeys = (Nr+1)*4 + 4;
 	    	mRoundKeys = new byte[lengthRoundKeys][NB]; //general array
 	    	countRoundKeys = 0;
+	    	
 	    	byte keyHex[] = new byte[keySize];
 			keyHex = StringKeyToHex(keyHexString, keySize);
+	    	
 	    	// Test for 128 bit key
 	        // byte keyHex[] = new byte[] {0x2b, 0x7e, 0x15, 0x16, 0x28, (byte) 0xae, (byte) 0xd2, (byte) 0xa6, (byte) 0xab, (byte) 0xf7, 0x15, (byte) 0x88, 0x09, (byte) 0xcf, 0x4f, 0x3c };
 	    	
 	    	// Test for 192 bit key
 	        // byte keyHex[] = new byte[] {(byte) 0x8e, 0x73, (byte) 0xb0, (byte) 0xf7, (byte) 0xda, 0x0e, 0x64, 0x52, (byte) 0xc8, 0x10, (byte) 0xf3, 0x2b, 
 	    	//							(byte) 0x80, (byte) 0x90, 0x79, (byte) 0xe5, 0x62, (byte) 0xf8, (byte) 0xea, (byte) 0xd2, 0x52, 0x2c, 0x6b, 0x7b};
+	    	// Test for 256 bit key
+	    	//byte keyHex[] = new byte[] {0x60, 0x3d, (byte) 0xeb, 0x10, 0x15, (byte) 0xca, 0x71, (byte) 0xbe, 0x2b, 0x73, (byte) 0xae, (byte) 0xf0, (byte) 0x85, 0x7d, 0x77, (byte) 0x81,
+	    	//							0x1f, 0x35, 0x2c, 0x07, 0x3b, 0x61, 0x08, (byte) 0xd7, 0x2d, (byte) 0x98, 0x10, (byte) 0xa3, 0x09, 0x14, (byte) 0xdf, (byte) 0xf4};
 	    	
 
 			// init key for Round 0 +
@@ -288,7 +295,7 @@ public class AES {
 				}
 				countRoundKeys++;
 			}
-			//last Round keys
+			//Remaining Round keys
 			byte keyHexRound[] = new byte[keySize];
 			for(int i = 0; i < keySize; i++) {
 				keyHexRound[i] = keyHex[i];
@@ -297,7 +304,7 @@ public class AES {
 			int countRound = 0;
 			if(Nr == 10) countRound = 11;
 			if(Nr == 12) countRound = 9;
-			//if(Nr == 14)
+			if(Nr == 14) countRound = 8;
 			for(int i = 1; i < countRound; i++) {
 				keyHexRound = generateRoundKeys(keyHexRound, keySize, NB, Nk, Nr, RC[i-1]);
 			}

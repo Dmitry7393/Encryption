@@ -20,7 +20,7 @@ public class Decrypt extends AES implements Runnable {
 	private int keySize;
 	private int Nk;
 	private int Nr;
-	private void initRound(String str_key)
+	private void createRoundKeys(String str_key)
 	{
 		Round = new byte[Nr+1][4][4];
 		Round = initRoundKeys(str_key, keySize, NB, Nk, Nr);
@@ -121,7 +121,7 @@ public class Decrypt extends AES implements Runnable {
 		     Nk = 8;
 		     Nr = 14;
 		}
-		initRound(key);
+		createRoundKeys(key);
 		CommonSizeOfFiles = 0;
 	}
     public  void convertToHex(File file, String pathNew) throws IOException {

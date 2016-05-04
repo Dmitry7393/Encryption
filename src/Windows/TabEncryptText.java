@@ -7,6 +7,8 @@ import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
@@ -66,6 +68,14 @@ public class TabEncryptText extends JPanel {
 	    gbc = new GridBagConstraints();
 	    gbc.insets = new Insets(0,20,20,0);
 	    gbc.anchor = GridBagConstraints.NORTHWEST;
+	    //Limiting the number of characters in a JTextField
+	    jtf_key.addKeyListener(new KeyAdapter() {
+	        @Override
+	        public void keyTyped(KeyEvent e) {
+	            if (jtf_key.getText().length() >= 32) // limit to 32 characters
+	                e.consume();
+	        }
+	    });
 		btn_encrypt.addActionListener(new ActionListener()
 		{
 			@Override

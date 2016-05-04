@@ -21,7 +21,7 @@ public class Encrypt extends AES implements Runnable {
 	private int keySize;
 	private int Nk;
 	private int Nr;
-	private void initRound(String str_key)
+	private void createRoundKeys(String str_key)
 	{
 		Round = new byte[Nr+1][4][4];
 		Round = initRoundKeys(str_key, keySize, NB, Nk, Nr);
@@ -30,18 +30,25 @@ public class Encrypt extends AES implements Runnable {
 	{
 		//show(plain_text);
 		XOR(plain_text, Round[0]);
+		//System.out.println("Round " + 0);
+		//show(Round[0]);
 		for(int i = 1; i < Nr; i++)
 		{
 			SubBytes(plain_text, false);
 			ShiftRows(plain_text, false);
 			MixColumns(plain_text, false);
 			XOR(plain_text, Round[i]); 
+			//System.out.println("Round " + i);
+			//show(Round[i]);
 		}
 		//AES Round 10 no Mix columns 
 		SubBytes(plain_text, false);
 		ShiftRows(plain_text, false);
 		XOR(plain_text, Round[Nr]);
+		//System.out.println("The last round");
+		//show(Round[Nr]);
 		//write_to_file(plain_text, "D:/ciphertext.txt");
+		//show(plain_text);
 		byte[] ciphertextBytes = new byte[16];
 		if(typeEncryption.equals("file"))
 		{
@@ -116,7 +123,7 @@ public class Encrypt extends AES implements Runnable {
 		     Nk = 8;
 		     Nr = 14;
 		}
-		initRound(key);
+		createRoundKeys(key);
 		CommonSizeOfFiles = 81980;
 	}
     public  void convertToHex(File file, String pathNew) throws IOException {
