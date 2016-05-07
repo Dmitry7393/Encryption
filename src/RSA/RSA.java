@@ -40,45 +40,60 @@ public class RSA implements Runnable {
 		// "12131072439211271897323671531612440428472427633701410925634549312301964373042085619324197365322416866541017057361365214171711713797974299334871062829803541";
 		// String strQ =
 		// "12027524255478748885956220793734512128733387803682075433653899983955179850988797899869146900809131611153346817050832096022160146366346391812470987105415233";
-		String strP = "113";
-		String strQ = "149";
-
-		BigInteger p = new BigInteger(strP);
-		BigInteger q = new BigInteger(strQ);
+		BigInteger p = new BigInteger("12131072439211271897323671531612440428472427633701410925634549312301964373042085619324197365322416866541017057361365214171711713797974299334871062829803541");
+		BigInteger q = new BigInteger("12027524255478748885956220793734512128733387803682075433653899983955179850988797899869146900809131611153346817050832096022160146366346391812470987105415233");
+		/*while(true) {
+			p = getRandomBigInteger(512);
+			if(p.isProbablePrime(1) == true) {
+				break;
+			}
+		}
+		while(true) {
+			q = getRandomBigInteger(512);
+			if(q.isProbablePrime(1) == true) {
+				break;
+			}
+		}*/
+		System.out.println("p = " + p);
+		System.out.println("q = " + q);
+		
 		BigInteger n = p.multiply(q);
-		System.out.println("n = " + n);
 		BigInteger phi = p.subtract(BigInteger.ONE).multiply(q.subtract(BigInteger.ONE));
 		System.out.println("phi = " + phi);
 
-		BigInteger e;
+		//Create e  1 < e < phi, e and n are coprime
+		BigInteger e = new BigInteger("65537");
 		BigInteger randomBigInteger;
-		while (true) {
-			randomBigInteger = getRandomBigInteger(24);
+		/*while (true) {
+			randomBigInteger = getRandomBigInteger(56);
 			if (gcd(randomBigInteger, phi).equals(BigInteger.ONE) && randomBigInteger.compareTo(BigInteger.ONE) > 0
 					&& randomBigInteger.compareTo(phi) < 0) {
 				e = randomBigInteger;
 				break;
 			}
-		}
-
-		// System.out.println("e = " + e);
-		int countFive = 0;
-		while (true) {
-			randomBigInteger = getRandomBigInteger(24);
-			if (e.multiply(randomBigInteger).mod(phi).compareTo(BigInteger.ONE) == 0) {
-
-				arrayBigIntD.add(randomBigInteger);
-				countFive++;
+		}*/
+		System.out.println("e = " + e);
+		//Search d
+		BigInteger d = e.modInverse(phi);
+		System.out.println("d == " + d);
+		/*BigInteger r1 = new BigInteger("89489425009274444368228545921773093919669586065884257445497854456487674839629818390934941973262879616797970608917283679875499331574161113854088813275488110588247193077582527278437906504015680623423550067240042466665654232383502922215493623289472138866445818789127946123407807725702626644091036502372545139713");
+	//	  for(BigInteger bi = phi;
+	   //             bi.compareTo(phi.multiply(e)) < 0;
+	     //           bi = bi.add(BigInteger.ONE)) {
+		
+			//randomBigInteger = getRandomBigInteger(1024);
+			//System.out.println("r = " + e.multiply(randomBigInteger).mod(phi));
+			
+			if (e.multiply(r1).mod(phi).compareTo(BigInteger.ONE) == 0) {
+				d = r1;
+				//break;
 			}
-			if (countFive == 5)
-				break;
-		}
-		BigInteger d = arrayBigIntD.get(Random(0, arrayBigIntD.size() - 1));
+		//}
 
 		System.out.println("public key: (e, n) (" + e + "," + n + ")");
 		System.out.println("private key: (d, n) (" + d + "," + n + ")");
 
-		BigInteger m = BigInteger.valueOf(19);
+		BigInteger m = new BigInteger("1976620216402300889624482718775150");
 
 		BigInteger c = m.modPow(e, n);
 		System.out.println("Encryption: " + c);
