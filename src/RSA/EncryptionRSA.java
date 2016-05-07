@@ -7,6 +7,7 @@ public class EncryptionRSA extends RSA {
 	private int[] sourceTextHex;
 	private BigInteger encryptedText;
 
+	//Init public key
 	public EncryptionRSA(String e, String n) {
 		super.e = new BigInteger(e);
 		super.n = new BigInteger(n);
