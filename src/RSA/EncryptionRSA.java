@@ -2,11 +2,16 @@ package RSA;
 
 import java.math.BigInteger;
 
-public class EncryptionRSA extends RSA implements Runnable {
-	private Thread thread;
+public class EncryptionRSA extends RSA {
+
 	private int[] sourceTextHex;
 	private BigInteger encryptedText;
-	
+
+	public EncryptionRSA(String e, String n) {
+		super.e = new BigInteger(e);
+		super.n = new BigInteger(n);
+	}
+
 	private int[] getHexCode(String text) {
 		int block16Byte[] = new int[text.length()];
 		String convert;
@@ -34,19 +39,15 @@ public class EncryptionRSA extends RSA implements Runnable {
 	public void EncryptText(String text) {
 		sourceTextHex = getHexCode(text);
 		showBytes(sourceTextHex); // just show in console
-		thread = new Thread(this, "Encrypt with RSA");
-		thread.start();
-	}
-
-	@Override
-	public void run() {
 		String strSourceText = "";
 		for (int i = 0; i < sourceTextHex.length; i++) {
 			strSourceText += Integer.toString(sourceTextHex[i]);
 		}
-
 		System.out.println("strSourceText " + strSourceText);
 		encryptedText = EncryptWithRSA(strSourceText);
 	}
 
+	public String getEncryptedText() {
+		return encryptedText.toString();
+	}
 }

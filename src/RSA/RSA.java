@@ -1,16 +1,16 @@
 package RSA;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.Random;
 
 public class RSA {
 	private BigInteger p;
 	private BigInteger q;
-	private BigInteger n;
 	private BigInteger phi;
-	private BigInteger e;
-	private BigInteger d;
+	
+	protected BigInteger e;
+	protected BigInteger d;
+	protected BigInteger n;
 
 	public BigInteger getRandomBigInteger(int pow) {
 		Random rand = new Random();
@@ -27,7 +27,8 @@ public class RSA {
 		}
 		return a;
 	}
-	private void createKeys() {
+
+	protected void createKeys() {
 		while (true) {
 			p = getRandomBigInteger(512);
 			if (p.isProbablePrime(1) == true) {
@@ -61,23 +62,23 @@ public class RSA {
 
 		// Search d
 		d = e.modInverse(phi);
+		System.out.println("d = " + d);
 	}
+
 	public BigInteger EncryptWithRSA(String sourceText) {
-		
-		createKeys();
+
 		System.out.println("public key: (e, n) (" + e + "," + n + ")");
-		System.out.println("private key: (d, n) (" + d + "," + n + ")");
+		//System.out.println("private key: (d, n) (" + d + "," + n + ")");
 
 		BigInteger message = new BigInteger(sourceText);
 
 		BigInteger c = message.modPow(e, n);
 		System.out.println("Encryption: " + c);
 
-		BigInteger m_decrypted = c.modPow(d, n);
-		System.out.println("Decryption: " + m_decrypted);
-		
+		//BigInteger m_decrypted = c.modPow(d, n);
+		//System.out.println("Decryption: " + m_decrypted);
+
 		return c;
 	}
-	
 
 }

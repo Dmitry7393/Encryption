@@ -46,8 +46,8 @@ public class TabEncryptText extends JPanel {
 	private JButton btnGetCiphertextFromImage = new JButton("Get ciphertext from image");
 	private ImageIcon imageIconOriginal;
 	private String pathOriginalImage = "";
-	private  JLabel picLabel_original = new JLabel();
-	private  JLabel picLabel_decrypted = new JLabel();
+	private JLabel picLabel_original = new JLabel();
+	private JLabel picLabel_decrypted = new JLabel();
 	private JButton open_file = new JButton("Open file to decrypt");
 	
 	TabEncryptText(int frameLocationX, int frameLocationY) {
