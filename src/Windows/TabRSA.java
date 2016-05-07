@@ -10,6 +10,7 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
+import RSA.EncryptionRSA;
 import RSA.RSA;
 
 
@@ -26,8 +27,8 @@ public class TabRSA extends JPanel {
 		{
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				RSA rs = new RSA();
-				rs.test();
+				EncryptionRSA rs = new EncryptionRSA();
+				rs.EncryptText("Thats my Kung Fu");
 			}
 		});
 	
