@@ -27,7 +27,7 @@ public class TabRSA extends JPanel {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				RSA rs = new RSA();
-				rs.rsa_example();
+				rs.test();
 			}
 		});
 	
