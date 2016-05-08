@@ -54,7 +54,7 @@ public class TabEncryptFiles extends JPanel {
 	private JCheckBox checkBoxArchive = new JCheckBox("Save files to archive");
 	private DefaultListModel<String> mDefaultListModel = new DefaultListModel<String>();
 	private DefaultTableModel mDefaultTableModel = new DefaultTableModel();
-	private Dimension dimenstionTable = new Dimension(160, 120);
+	private Dimension dimenstionTable = new Dimension(230, 120);
 
 	private Encrypt mEncryptFile;
 	private List<File> mArrayFiles = new ArrayList<File>();
