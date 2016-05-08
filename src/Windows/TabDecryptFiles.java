@@ -144,7 +144,7 @@ public class TabDecryptFiles extends JPanel {
 							.getTransferData(DataFlavor.javaFileListFlavor);
 					for (File file : droppedFiles) {
 						mArrayFiles.add(file);
-						mDefaultTableModel.addRow(new String[] { file.getName() + "_encrypted.png" });
+						mDefaultTableModel.addRow(new String[] { file.getName()});
 						mDefaultListModel.addElement(file.getName());
 						mSizeOfSourceFiles += file.length();
 					}
