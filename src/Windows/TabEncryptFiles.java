@@ -13,6 +13,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,16 +29,22 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
 import javax.swing.Timer;
 import javax.swing.border.Border;
+import javax.swing.table.DefaultTableModel;
+
 import AES.Encrypt;
 
 public class TabEncryptFiles extends JPanel {
 	private static final long serialVersionUID = 1L;
 	private JLabel str_key = new JLabel("Key");
+	private JLabel str_amount_bytes = new JLabel("0 bytes");
 
-	private JButton btn_encrypt_file = new JButton("Encrypt file");
+	private JButton btn_choose_files = new JButton("Choose files");
 	private JButton btn_encrypt_files = new JButton("Encrypt files");
 	private JButton open_file = new JButton("Open file to decrypt");
 	private JButton btn_clear_list = new JButton("Clear list");
@@ -45,11 +52,13 @@ public class TabEncryptFiles extends JPanel {
 	private JTextField jtf_key;
 	private GridBagConstraints gbc;
 	private JCheckBox checkBoxArchive = new JCheckBox("Save files to archive");
-	private DefaultListModel<String> defaultListModel = new DefaultListModel<String>();
+	private DefaultListModel<String> mDefaultListModel = new DefaultListModel<String>();
+	private DefaultTableModel mDefaultTableModel = new DefaultTableModel();
+	private Dimension dimenstionTable = new Dimension(160, 120);
 
-	private Encrypt encryptFile;
+	private Encrypt mEncryptFile;
 	private List<File> mArrayFiles = new ArrayList<File>();
-	private long sizeOfSourceFiles = 0;
+	private long mSizeOfSourceFiles = 0;
 
 	public TabEncryptFiles() {
 
@@ -66,16 +75,42 @@ public class TabEncryptFiles extends JPanel {
 		Timer timer = new Timer(100, new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				long valuePercent = (100 * encryptFile.getCommonSizeOfFiles()) / sizeOfSourceFiles;
+				long valuePercent = (100 * mEncryptFile.getCommonSizeOfFiles()) / mSizeOfSourceFiles;
 				progressBar.setValue((int) valuePercent);
-				if (encryptFile.threadIsAlive() == false) {
+				if (mEncryptFile.threadIsAlive() == false) {
 					((Timer) arg0.getSource()).stop();
-					JOptionPane.showMessageDialog(null, "File was encrypted!!!");
+					JOptionPane.showMessageDialog(null, "Files were encrypted!!!");
+					progressBar.setValue(0);
 				}
 			}
 		});
-		JList<String> filesList = new JList<String>(defaultListModel);
-		filesList.setPreferredSize(new Dimension(180, 100));
+		JList<String> list = new JList<String>(mDefaultListModel);
+		JScrollPane scrollList = new JScrollPane(list);
+		scrollList.setPreferredSize(dimenstionTable);
+		Box listBoxSourceFiles = new Box(BoxLayout.Y_AXIS);
+		listBoxSourceFiles.add(scrollList);
+		listBoxSourceFiles.add(new JLabel("Source files"));
+
+		list.addKeyListener(new KeyListener() {
+			public void keyPressed(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_DELETE) {
+					int selectedIndex = list.getSelectedIndex();
+					if (selectedIndex != -1) {
+						mSizeOfSourceFiles -= mArrayFiles.get(selectedIndex).length();
+						mArrayFiles.remove(selectedIndex);
+						mDefaultListModel.remove(selectedIndex);
+						mDefaultTableModel.removeRow(selectedIndex);
+					}
+					showSizeOfFiles();
+				}
+			}
+
+			public void keyReleased(KeyEvent e) {
+			}
+
+			public void keyTyped(KeyEvent e) {
+			}
+		});
 
 		JPanel panelEncrypt = new JPanel();
 		panelEncrypt.setLayout(new BoxLayout(panelEncrypt, BoxLayout.X_AXIS));
@@ -87,6 +122,17 @@ public class TabEncryptFiles extends JPanel {
 		panelEncrypt.add(new JLabel("Drag files here to encrypt them"));
 		panelEncrypt.add(Box.createHorizontalGlue());
 
+		JTable table = new JTable(mDefaultTableModel);
+		mDefaultTableModel.addColumn("");
+		table.setShowGrid(false);
+		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		JScrollPane scrollTable = new JScrollPane(table);
+		scrollTable.setColumnHeader(null);
+		scrollTable.setPreferredSize(dimenstionTable);
+		Box tableBox = new Box(BoxLayout.Y_AXIS);
+		tableBox.add(scrollTable);
+		tableBox.add(new JLabel("New files"));
+
 		panelEncrypt.setDropTarget(new DropTarget() {
 			private static final long serialVersionUID = 1L;
 
@@ -96,12 +142,13 @@ public class TabEncryptFiles extends JPanel {
 					@SuppressWarnings("unchecked")
 					List<File> droppedFiles = (List<File>) evt.getTransferable()
 							.getTransferData(DataFlavor.javaFileListFlavor);
-					sizeOfSourceFiles = 0;
 					for (File file : droppedFiles) {
 						mArrayFiles.add(file);
-						defaultListModel.addElement(file.getName());
-						sizeOfSourceFiles += file.length();
+						mDefaultTableModel.addRow(new String[] { file.getName() + "_encrypted.png" });
+						mDefaultListModel.addElement(file.getName());
+						mSizeOfSourceFiles += file.length();
 					}
+					showSizeOfFiles();
 				} catch (Exception ex) {
 					ex.printStackTrace();
 				}
@@ -124,30 +171,22 @@ public class TabEncryptFiles extends JPanel {
 					e.consume();
 			}
 		});
-		btn_encrypt_file.addActionListener(new ActionListener() {
+		// Choose files with OpenDialogWindow
+		btn_choose_files.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				File sourceFile = null;
-				File fileOutput = null;
-				sizeOfSourceFiles = 0;
 				JFileChooser fileChooser = new JFileChooser(System.getProperty("user.dir"));
 				fileChooser.setPreferredSize(new Dimension(1000, 600));
-
+				fileChooser.setMultiSelectionEnabled(true);
 				if (fileChooser.showOpenDialog(open_file) == JFileChooser.APPROVE_OPTION) {
-					sourceFile = fileChooser.getSelectedFile();
-					sizeOfSourceFiles = sourceFile.length(); // size of 1 file
-				}
-				if (fileChooser.showSaveDialog(fileChooser) == JFileChooser.APPROVE_OPTION) {
-					fileOutput = fileChooser.getSelectedFile();
-				}
-				if (sourceFile != null && fileOutput != null) {
-					try {
-						encryptFile = new Encrypt(jtf_key.getText());
-						encryptFile.EncryptFile(sourceFile, fileOutput.getPath() + "_encrypted.png");
-						timer.start();
-					} catch (NullPointerException e) {
-						System.out.println("NullPointerException: " + e);
+					File[] arrayFiles = fileChooser.getSelectedFiles();
+					for (int i = 0; i < arrayFiles.length; i++) {
+						mArrayFiles.add(arrayFiles[i]);
+						mDefaultListModel.addElement(arrayFiles[i].getName());
+						mDefaultTableModel.addRow(new String[] { arrayFiles[i].getName() + "_encrypted.png" });
+						mSizeOfSourceFiles += arrayFiles[i].length();
 					}
+					showSizeOfFiles();
 				}
 
 			}
@@ -166,13 +205,18 @@ public class TabEncryptFiles extends JPanel {
 					List<String> outputPaths = new ArrayList<String>();
 
 					if (f.getSelectedFile() != null) {
+						mSizeOfSourceFiles = 0; // Calculate common size of
+												// files from scratch
 						for (int i = 0; i < mArrayFiles.size(); i++) {
-							outputPaths
-									.add(f.getSelectedFile() + "/" + mArrayFiles.get(i).getName() + "_encrypted.png");
+							mSizeOfSourceFiles += mArrayFiles.get(i).length();
+						}
+						for (int count = 0; count < mDefaultTableModel.getRowCount(); count++) {
+							outputPaths.add(
+									f.getSelectedFile() + "/" + mDefaultTableModel.getValueAt(count, 0).toString());
 						}
 					}
-					encryptFile = new Encrypt(jtf_key.getText());
-					encryptFile.EncryptGroupsOfFiles(mArrayFiles, outputPaths);
+					mEncryptFile = new Encrypt(jtf_key.getText());
+					mEncryptFile.EncryptGroupsOfFiles(mArrayFiles, outputPaths);
 					timer.start();
 				}
 
@@ -182,7 +226,9 @@ public class TabEncryptFiles extends JPanel {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				mArrayFiles.clear();
-				defaultListModel.removeAllElements();
+				mDefaultListModel.removeAllElements();
+				mDefaultTableModel.setRowCount(0);
+				mSizeOfSourceFiles = 0;
 			}
 		});
 		gbc.gridx = 0;
@@ -200,7 +246,7 @@ public class TabEncryptFiles extends JPanel {
 
 		gbc.gridx = 0;
 		gbc.gridy = 1;
-		add(btn_encrypt_file, gbc);
+		add(btn_choose_files, gbc);
 
 		gbc.gridx = 1;
 		gbc.gridy = 3;
@@ -215,7 +261,11 @@ public class TabEncryptFiles extends JPanel {
 		gbc.gridy = 1;
 		gbc.gridwidth = 2;
 		gbc.gridheight = 2;
-		add(filesList, gbc);
+		add(listBoxSourceFiles, gbc);
+
+		gbc.gridx = 4;
+		gbc.gridy = 1;
+		add(tableBox, gbc);
 
 		gbc.gridx = 2;
 		gbc.gridy = 3;
@@ -224,5 +274,12 @@ public class TabEncryptFiles extends JPanel {
 		gbc.gridx = 4;
 		gbc.gridy = 5;
 		add(btn_encrypt_files, gbc);
+
+		gbc.gridx = 2;
+		gbc.gridy = 0;
+		add(str_amount_bytes, gbc);
+	}
+	private void showSizeOfFiles() {
+		str_amount_bytes.setText(Long.toString((mSizeOfSourceFiles / 1024) / 1024) + " megabytes");
 	}
 }
