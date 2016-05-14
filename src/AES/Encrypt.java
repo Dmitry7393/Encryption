@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Encrypt extends AES implements Runnable {
-	Thread thread;
+	private Thread thread;
 	private String cipherTextBase64 = "";
 	private byte Round[][][];
 	private ArrayList<Byte> arrayListBytes = new ArrayList<Byte>();
@@ -181,11 +181,16 @@ public class Encrypt extends AES implements Runnable {
 	@Override
 	public void run() {
 		for (int i = 0; i < sourceFilesList.size(); i++) {
-			try {
-				convertToHex(sourceFilesList.get(i), outputPathsList.get(i));
-			} catch (IOException e) {
+			if (!Thread.currentThread().isInterrupted()) {
+				try {
+					System.out.println("thread works");
+					convertToHex(sourceFilesList.get(i), outputPathsList.get(i));
+				} catch (IOException e) {
+				}
 			}
+
 		}
+		System.out.println("thread stopped");
 	}
 
 	public Boolean threadIsAlive() {
@@ -194,5 +199,9 @@ public class Encrypt extends AES implements Runnable {
 
 	public long getCommonSizeOfFiles() {
 		return CommonSizeOfFiles;
+	}
+
+	public void stopEncryption() {
+		thread.interrupt();
 	}
 }

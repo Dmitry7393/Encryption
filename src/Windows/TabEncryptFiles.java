@@ -46,6 +46,7 @@ public class TabEncryptFiles extends JPanel {
 
 	private JButton btn_choose_files = new JButton("Choose files");
 	private JButton btn_encrypt_files = new JButton("Encrypt files");
+	private JButton btn_stop_encryption = new JButton("Stop encrypting");
 	private JButton open_file = new JButton("Open file to decrypt");
 	private JButton btn_clear_list = new JButton("Clear list");
 
@@ -81,6 +82,8 @@ public class TabEncryptFiles extends JPanel {
 					((Timer) arg0.getSource()).stop();
 					JOptionPane.showMessageDialog(null, "Files were encrypted!!!");
 					progressBar.setValue(0);
+					btn_stop_encryption.setEnabled(false);
+					btn_encrypt_files.setEnabled(true);
 				}
 			}
 		});
@@ -217,6 +220,8 @@ public class TabEncryptFiles extends JPanel {
 					}
 					mEncryptFile = new Encrypt(jtf_key.getText());
 					mEncryptFile.EncryptGroupsOfFiles(mArrayFiles, outputPaths);
+					btn_encrypt_files.setEnabled(false);
+					btn_stop_encryption.setEnabled(true);
 					timer.start();
 				}
 
@@ -231,6 +236,18 @@ public class TabEncryptFiles extends JPanel {
 				mSizeOfSourceFiles = 0;
 			}
 		});
+		btn_stop_encryption.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				mEncryptFile.stopEncryption();
+				btn_stop_encryption.setEnabled(false);
+				//btn_encrypt_files.setEnabled(true);
+			}
+		});
+		JPanel inPanel = new JPanel();        // Create new panel
+		inPanel.add(btn_encrypt_files);       // Add components to it
+		inPanel.add(btn_stop_encryption);
+		
 		gbc.gridx = 0;
 		gbc.gridy = 0;
 		add(str_key, gbc);
@@ -267,14 +284,14 @@ public class TabEncryptFiles extends JPanel {
 		gbc.gridy = 1;
 		add(tableBox, gbc);
 
-		gbc.gridx = 2;
-		gbc.gridy = 3;
+		gbc.gridx = 4;
+		gbc.gridy = 0;
 		add(btn_clear_list, gbc);
 
-		gbc.gridx = 4;
+		gbc.gridx = 3;
 		gbc.gridy = 5;
-		add(btn_encrypt_files, gbc);
-
+		add(inPanel, gbc);
+		
 		gbc.gridx = 2;
 		gbc.gridy = 0;
 		add(str_amount_bytes, gbc);

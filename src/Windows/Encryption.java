@@ -20,9 +20,7 @@ import javax.swing.SwingUtilities;
 public class Encryption {
 	private SystemTray systemTray = SystemTray.getSystemTray();
 	private TrayIcon trayIcon;
-	String prefix = "foobar";
-	String suffix = ".tmp";
-
+	private Boolean displayTrayMessage;
 	Encryption() throws IOException, URISyntaxException {
 
 		JFrame frame = new JFrame("Encryption");
@@ -67,6 +65,7 @@ public class Encryption {
 				removeTrayIcon();
 			}
 		});
+		displayTrayMessage = true;
 
 		frame.addWindowStateListener(new WindowStateListener() {
 			public void windowStateChanged(WindowEvent e) {
@@ -100,8 +99,12 @@ public class Encryption {
 	private void addTrayIcon() {
 		try {
 			systemTray.add(trayIcon);
-			trayIcon.displayMessage("Encryption", "Window minimised to tray, double click to show",
-					TrayIcon.MessageType.INFO);
+			if(displayTrayMessage) {
+				trayIcon.displayMessage("Encryption", "Window minimised to tray, double click to show",
+						TrayIcon.MessageType.INFO);
+				displayTrayMessage = false;
+			}
+		
 		} catch (AWTException ex) {
 			ex.printStackTrace();
 		}
