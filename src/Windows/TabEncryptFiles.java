@@ -217,12 +217,12 @@ public class TabEncryptFiles extends JPanel {
 							outputPaths.add(
 									f.getSelectedFile() + "/" + mDefaultTableModel.getValueAt(count, 0).toString());
 						}
+						mEncryptFile = new Encrypt(jtf_key.getText());
+						mEncryptFile.EncryptGroupsOfFiles(mArrayFiles, outputPaths);
+						btn_encrypt_files.setEnabled(false);
+						btn_stop_encryption.setEnabled(true);
+						timer.start();
 					}
-					mEncryptFile = new Encrypt(jtf_key.getText());
-					mEncryptFile.EncryptGroupsOfFiles(mArrayFiles, outputPaths);
-					btn_encrypt_files.setEnabled(false);
-					btn_stop_encryption.setEnabled(true);
-					timer.start();
 				}
 
 			}
@@ -241,13 +241,13 @@ public class TabEncryptFiles extends JPanel {
 			public void actionPerformed(ActionEvent arg0) {
 				mEncryptFile.stopEncryption();
 				btn_stop_encryption.setEnabled(false);
-				//btn_encrypt_files.setEnabled(true);
+				// btn_encrypt_files.setEnabled(true);
 			}
 		});
-		JPanel inPanel = new JPanel();        // Create new panel
-		inPanel.add(btn_encrypt_files);       // Add components to it
+		JPanel inPanel = new JPanel(); // Create new panel
+		inPanel.add(btn_encrypt_files); // Add components to it
 		inPanel.add(btn_stop_encryption);
-		
+
 		gbc.gridx = 0;
 		gbc.gridy = 0;
 		add(str_key, gbc);
@@ -291,11 +291,12 @@ public class TabEncryptFiles extends JPanel {
 		gbc.gridx = 3;
 		gbc.gridy = 5;
 		add(inPanel, gbc);
-		
+
 		gbc.gridx = 2;
 		gbc.gridy = 0;
 		add(str_amount_bytes, gbc);
 	}
+
 	private void showSizeOfFiles() {
 		str_amount_bytes.setText(Long.toString((mSizeOfSourceFiles / 1024) / 1024) + " megabytes");
 	}

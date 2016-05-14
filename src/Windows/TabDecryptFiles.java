@@ -46,6 +46,7 @@ public class TabDecryptFiles extends JPanel {
 
 	private JButton btn_choose_files = new JButton("Choose files");
 	private JButton btn_decrypt_files = new JButton("Decrypt files");
+	private JButton btn_stop_decryption = new JButton("Stop decrypting");
 	private JButton open_file = new JButton("Open file to decrypt");
 	private JButton btn_clear_list = new JButton("Clear list");
 
@@ -79,8 +80,10 @@ public class TabDecryptFiles extends JPanel {
 				progressBar.setValue((int) valuePercent);
 				if (mDecryptFile.threadIsAlive() == false) {
 					((Timer) arg0.getSource()).stop();
-					JOptionPane.showMessageDialog(null, "Files were encrypted!!!");
+					JOptionPane.showMessageDialog(null, "Files were decrypted!!!");
 					progressBar.setValue(0);
+					btn_stop_decryption.setEnabled(false);
+					btn_decrypt_files.setEnabled(true);
 				}
 			}
 		});
@@ -89,7 +92,7 @@ public class TabDecryptFiles extends JPanel {
 		scrollList.setPreferredSize(dimenstionTable);
 		Box listBoxSourceFiles = new Box(BoxLayout.Y_AXIS);
 		listBoxSourceFiles.add(scrollList);
-		listBoxSourceFiles.add(new JLabel("Encrypted files"));
+		listBoxSourceFiles.add(new JLabel("Source files"));
 
 		list.addKeyListener(new KeyListener() {
 			public void keyPressed(KeyEvent e) {
@@ -119,7 +122,7 @@ public class TabDecryptFiles extends JPanel {
 		panelDecrypt.setVisible(true);
 
 		panelDecrypt.add(Box.createHorizontalGlue());
-		panelDecrypt.add(new JLabel("Drag files here to encrypt them"));
+		panelDecrypt.add(new JLabel("Drag files here to decrypt them"));
 		panelDecrypt.add(Box.createHorizontalGlue());
 
 		JTable table = new JTable(mDefaultTableModel);
@@ -131,7 +134,7 @@ public class TabDecryptFiles extends JPanel {
 		scrollTable.setPreferredSize(dimenstionTable);
 		Box tableBox = new Box(BoxLayout.Y_AXIS);
 		tableBox.add(scrollTable);
-		tableBox.add(new JLabel("New decrypted files"));
+		tableBox.add(new JLabel("New files"));
 
 		panelDecrypt.setDropTarget(new DropTarget() {
 			private static final long serialVersionUID = 1L;
@@ -144,7 +147,7 @@ public class TabDecryptFiles extends JPanel {
 							.getTransferData(DataFlavor.javaFileListFlavor);
 					for (File file : droppedFiles) {
 						mArrayFiles.add(file);
-						mDefaultTableModel.addRow(new String[] { file.getName()});
+						mDefaultTableModel.addRow(new String[] {file.getName()});
 						mDefaultListModel.addElement(file.getName());
 						mSizeOfSourceFiles += file.length();
 					}
@@ -214,10 +217,12 @@ public class TabDecryptFiles extends JPanel {
 							outputPaths.add(
 									f.getSelectedFile() + "/" + mDefaultTableModel.getValueAt(count, 0).toString());
 						}
+						mDecryptFile = new Decrypt(jtf_key.getText());
+						mDecryptFile.DecryptGroupsOfFiles(mArrayFiles, outputPaths);
+						btn_decrypt_files.setEnabled(false);
+						btn_stop_decryption.setEnabled(true);
+						timer.start();
 					}
-					mDecryptFile = new Decrypt(jtf_key.getText());
-					mDecryptFile.DecryptGroupsOfFiles(mArrayFiles, outputPaths);
-					timer.start();
 				}
 
 			}
@@ -231,6 +236,17 @@ public class TabDecryptFiles extends JPanel {
 				mSizeOfSourceFiles = 0;
 			}
 		});
+		btn_stop_decryption.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				mDecryptFile.stopDecryption();
+				btn_stop_decryption.setEnabled(false);
+			}
+		});
+		JPanel inPanel = new JPanel(); // Create new panel
+		inPanel.add(btn_decrypt_files); // Add components to it
+		inPanel.add(btn_stop_decryption);
+
 		gbc.gridx = 0;
 		gbc.gridy = 0;
 		add(str_key, gbc);
@@ -267,13 +283,13 @@ public class TabDecryptFiles extends JPanel {
 		gbc.gridy = 1;
 		add(tableBox, gbc);
 
-		gbc.gridx = 2;
-		gbc.gridy = 3;
+		gbc.gridx = 4;
+		gbc.gridy = 0;
 		add(btn_clear_list, gbc);
 
-		gbc.gridx = 4;
+		gbc.gridx = 3;
 		gbc.gridy = 5;
-		add(btn_decrypt_files, gbc);
+		add(inPanel, gbc);
 
 		gbc.gridx = 2;
 		gbc.gridy = 0;

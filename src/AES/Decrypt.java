@@ -88,12 +88,11 @@ public class Decrypt extends AES implements Runnable {
 		thread.start();
 	}
 
-	public void DecryptFile(File sourceFile, String pathOutput) {
-		sourceFilesList.add(sourceFile);
-		outputPathList.add(pathOutput);
-		thread = new Thread(this, "Decryption file");
-		thread.start();
-	}
+	/*
+	 * public void DecryptFile(File sourceFile, String pathOutput) {
+	 * sourceFilesList.add(sourceFile); outputPathList.add(pathOutput); thread =
+	 * new Thread(this, "Decryption file"); thread.start(); }
+	 */
 
 	public Decrypt(String key) {
 		if (key.length() <= 16) {
@@ -191,10 +190,13 @@ public class Decrypt extends AES implements Runnable {
 	@Override
 	public void run() {
 		for (int i = 0; i < sourceFilesList.size(); i++) {
-			try {
-				convertToHex(sourceFilesList.get(i), outputPathList.get(i));
-			} catch (IOException e) {
+			if (!Thread.currentThread().isInterrupted()) {
+				try {
+					convertToHex(sourceFilesList.get(i), outputPathList.get(i));
+				} catch (IOException e) {
+				}
 			}
+
 		}
 	}
 
@@ -204,5 +206,8 @@ public class Decrypt extends AES implements Runnable {
 
 	public long getCommonSizeOfFiles() {
 		return CommonSizeOfFiles;
+	}
+	public void stopDecryption() {
+		thread.interrupt();
 	}
 }

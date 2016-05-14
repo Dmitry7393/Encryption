@@ -30,10 +30,8 @@ public class EncryptionRSA extends RSA {
 		BigInteger bigNumber = BigInteger.valueOf(0);
 		BigInteger number256 = BigInteger.valueOf(256);
 		for (int i = 0; i < sourceTextHex.length; i++) {
-			System.out.print(sourceTextHex[i] + " ");
 			bigNumber = bigNumber.add(number256.pow(i).multiply(BigInteger.valueOf(sourceTextHex[i])));
 		}
-		System.out.println("bigNumber " + bigNumber);
 		encryptedText = EncryptWithRSA(bigNumber);
 	}
 
@@ -42,12 +40,8 @@ public class EncryptionRSA extends RSA {
 	}
 
 	private BigInteger EncryptWithRSA(BigInteger message) {
-
-		System.out.println("public key: (e, n) (" + e + "," + n + ")");
-
+		//System.out.println("public key: (e, n) (" + e + "," + n + ")");
 		BigInteger c = message.modPow(e, n);
-		System.out.println("Encryption: " + c);
-
 		return c;
 	}
 }

@@ -21,14 +21,12 @@ public class DecryptionRSA extends RSA {
 	}
 
 	public void DecryptText(String textInteger) {
-		System.out.println("textInteger: " + textInteger);
 		resultDecryption = DecryptWithRSA(new BigInteger(textInteger));
 
 		BigInteger value255 = BigInteger.valueOf(255);
 		byte[] outputBytes = new byte[16];
 		for (int i = 0; i < 16; i++) {
 			outputBytes[i] = resultDecryption.shiftRight(i * 8).and(value255).byteValue();
-			System.out.print(outputBytes[i] + " ");
 		}
 		stringDecryptedText = hexToString(outputBytes);
 	}
@@ -38,8 +36,7 @@ public class DecryptionRSA extends RSA {
 	}
 
 	private BigInteger DecryptWithRSA(BigInteger encryptedMessage) {
-
-		System.out.println("private key: (d, n) (" + d + "," + n + ")");
+		//System.out.println("private key: (d, n) (" + d + "," + n + ")");
 		BigInteger m_decrypted = encryptedMessage.modPow(d, n);
 		return m_decrypted;
 	}

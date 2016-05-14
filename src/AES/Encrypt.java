@@ -89,12 +89,12 @@ public class Encrypt extends AES implements Runnable {
 		thread.start();
 	}
 
-	public void EncryptFile(File sourceFile, String outputFile) {
+	/*public void EncryptFile(File sourceFile, String outputFile) {
 		sourceFilesList.add(sourceFile);
 		outputPathsList.add(outputFile);
 		thread = new Thread(this, "Encryption file");
 		thread.start();
-	}
+	}*/
 
 	public Encrypt(String key) {
 		if (key.length() <= 16) {
