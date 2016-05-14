@@ -42,12 +42,12 @@ public class RSA {
 			}
 		}
 
-		System.out.println("p = " + p);
-		System.out.println("q = " + q);
+		//System.out.println("p = " + p);
+		//System.out.println("q = " + q);
 
 		n = p.multiply(q);
 		phi = p.subtract(BigInteger.ONE).multiply(q.subtract(BigInteger.ONE));
-		System.out.println("phi = " + phi);
+		//System.out.println("phi = " + phi);
 
 		// Create e 1 < e < phi, e and n are coprime
 		BigInteger randomBigInteger;
@@ -62,23 +62,9 @@ public class RSA {
 
 		// Search d
 		d = e.modInverse(phi);
-		System.out.println("d = " + d);
+		//System.out.println("d = " + d);
 	}
 
-	public BigInteger EncryptWithRSA(String sourceText) {
 
-		System.out.println("public key: (e, n) (" + e + "," + n + ")");
-		//System.out.println("private key: (d, n) (" + d + "," + n + ")");
-
-		BigInteger message = new BigInteger(sourceText);
-
-		BigInteger c = message.modPow(e, n);
-		System.out.println("Encryption: " + c);
-
-		//BigInteger m_decrypted = c.modPow(d, n);
-		//System.out.println("Decryption: " + m_decrypted);
-
-		return c;
-	}
 
 }

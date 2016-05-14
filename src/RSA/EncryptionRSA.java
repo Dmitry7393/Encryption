@@ -4,17 +4,17 @@ import java.math.BigInteger;
 
 public class EncryptionRSA extends RSA {
 
-	private int[] sourceTextHex;
+	private byte[] sourceTextHex;
 	private BigInteger encryptedText;
 
-	//Init public key
+	// Init public key
 	public EncryptionRSA(String e, String n) {
 		super.e = new BigInteger(e);
 		super.n = new BigInteger(n);
 	}
 
-	private int[] getHexCode(String text) {
-		int block16Byte[] = new int[text.length()];
+	private byte[] getHexCode(String text) {
+		byte block16Byte[] = new byte[text.length()];
 		String convert;
 		for (int i = 0; i < text.length(); i++) {
 			char c = text.charAt(i);
@@ -25,30 +25,29 @@ public class EncryptionRSA extends RSA {
 		return block16Byte;
 	}
 
-	private void showBytes(int[] text16) {
-		StringBuffer strBuffer = new StringBuffer();
-		for (int i = 0; i < text16.length; i++) {
-			strBuffer.setLength(0);
-			strBuffer.append(Long.toHexString(text16[i]).toUpperCase());
-
-			System.out.print(strBuffer + " ");
-			strBuffer.setLength(0);
-		}
-
-	}
-
 	public void EncryptText(String text) {
 		sourceTextHex = getHexCode(text);
-		showBytes(sourceTextHex); // just show in console
-		String strSourceText = "";
+		BigInteger bigNumber = BigInteger.valueOf(0);
+		BigInteger number256 = BigInteger.valueOf(256);
 		for (int i = 0; i < sourceTextHex.length; i++) {
-			strSourceText += Integer.toString(sourceTextHex[i]);
+			System.out.print(sourceTextHex[i] + " ");
+			bigNumber = bigNumber.add(number256.pow(i).multiply(BigInteger.valueOf(sourceTextHex[i])));
 		}
-		System.out.println("strSourceText " + strSourceText);
-		encryptedText = EncryptWithRSA(strSourceText);
+		System.out.println("bigNumber " + bigNumber);
+		encryptedText = EncryptWithRSA(bigNumber);
 	}
 
 	public String getEncryptedText() {
 		return encryptedText.toString();
+	}
+
+	private BigInteger EncryptWithRSA(BigInteger message) {
+
+		System.out.println("public key: (e, n) (" + e + "," + n + ")");
+
+		BigInteger c = message.modPow(e, n);
+		System.out.println("Encryption: " + c);
+
+		return c;
 	}
 }

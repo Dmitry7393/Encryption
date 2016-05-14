@@ -15,6 +15,7 @@ import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
 
 import RSA.CreateKeys;
+import RSA.DecryptionRSA;
 import RSA.EncryptionRSA;
 
 public class TabRSA extends JPanel {
@@ -27,6 +28,7 @@ public class TabRSA extends JPanel {
 	private JTextArea plainTextArea = new JTextArea(5, 20);
 	private JTextArea cipherTextArea = new JTextArea(5, 20);
 	private JTextArea encryptedTextArea = new JTextArea(5, 20);
+	private JTextArea decryptedTextArea = new JTextArea(5, 20);
 	
 	private JLabel labelPublicKey = new JLabel("Public key");
 	private JLabel labelPrivateKey = new JLabel("Private key");
@@ -37,6 +39,7 @@ public class TabRSA extends JPanel {
 	private JTextField jtf_n_private;
 
 	TabRSA(int frameLocationX, int frameLocationY) {
+		
 		setLayout(new GridBagLayout());
 		plainTextArea.setText("Two One Nine Two");
 
@@ -53,6 +56,10 @@ public class TabRSA extends JPanel {
 		scrollCiphertextArea.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		scrollCiphertextArea.setVisible(true);
 
+		JScrollPane scrollDecryptedtextArea = new JScrollPane(decryptedTextArea);
+		scrollCiphertextArea.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		scrollCiphertextArea.setVisible(true);
+		
 		jtf_public_key = new JTextField(20);
 		jtf_private_key = new JTextField(20);
 		jtf_n_public = new JTextField(20);
@@ -73,9 +80,18 @@ public class TabRSA extends JPanel {
 		btn_encrypt.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				EncryptionRSA rs = new EncryptionRSA(jtf_public_key.getText(), jtf_n_public.getText());
-				rs.EncryptText(plainTextArea.getText());
-				encryptedTextArea.setText(rs.getEncryptedText());
+				EncryptionRSA encrRSA = new EncryptionRSA(jtf_public_key.getText(), jtf_n_public.getText());
+				encrRSA.EncryptText(plainTextArea.getText());
+				encryptedTextArea.setText(encrRSA.getEncryptedText());
+				cipherTextArea.setText(encrRSA.getEncryptedText());
+			}
+		});
+		btn_decrypt.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				DecryptionRSA decrRSA = new DecryptionRSA(jtf_private_key.getText(), jtf_n_private.getText());
+				decrRSA.DecryptText(cipherTextArea.getText());
+				decryptedTextArea.setText(decrRSA.getDecryptedText());
 
 			}
 		});
@@ -128,5 +144,8 @@ public class TabRSA extends JPanel {
 		gbc.gridy = 4;
 		add(scrollCiphertextArea, gbc);
 		
+		gbc.gridx = 2;
+		gbc.gridy = 4;
+		add(scrollDecryptedtextArea, gbc);
 	}
 }
