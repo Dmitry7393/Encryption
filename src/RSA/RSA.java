@@ -7,10 +7,13 @@ public class RSA {
 	private BigInteger p;
 	private BigInteger q;
 	private BigInteger phi;
-	
+
 	protected BigInteger e;
 	protected BigInteger d;
 	protected BigInteger n;
+
+	private static final int KEY_SIZE = 32;
+	private static final int P_Q_SIZE = 512;
 
 	public BigInteger getRandomBigInteger(int pow) {
 		Random rand = new Random();
@@ -30,41 +33,38 @@ public class RSA {
 
 	protected void createKeys() {
 		while (true) {
-			p = getRandomBigInteger(512);
+			p = getRandomBigInteger(P_Q_SIZE);
 			if (p.isProbablePrime(1) == true) {
 				break;
 			}
 		}
 		while (true) {
-			q = getRandomBigInteger(512);
+			q = getRandomBigInteger(P_Q_SIZE);
 			if (q.isProbablePrime(1) == true) {
 				break;
 			}
 		}
 
-		//System.out.println("p = " + p);
-		//System.out.println("q = " + q);
+		// System.out.println("p = " + p);
+		// System.out.println("q = " + q);
 
 		n = p.multiply(q);
 		phi = p.subtract(BigInteger.ONE).multiply(q.subtract(BigInteger.ONE));
-		//System.out.println("phi = " + phi);
+		// System.out.println("phi = " + phi);
 
 		// Create e 1 < e < phi, e and n are coprime
 		BigInteger randomBigInteger;
 		while (true) {
-			randomBigInteger = getRandomBigInteger(32);
+			randomBigInteger = getRandomBigInteger(KEY_SIZE);
 			if (gcd(randomBigInteger, phi).equals(BigInteger.ONE) && randomBigInteger.compareTo(BigInteger.ONE) > 0
 					&& randomBigInteger.compareTo(phi) < 0) {
 				e = randomBigInteger;
 				break;
 			}
 		}
-
 		// Search d
 		d = e.modInverse(phi);
-		//System.out.println("d = " + d);
+		// System.out.println("d = " + d);
 	}
-
-
 
 }

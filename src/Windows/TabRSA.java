@@ -5,6 +5,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -23,6 +24,8 @@ public class TabRSA extends JPanel {
 	private JButton btn_generate_keys = new JButton("Generate keys");
 	private JButton btn_encrypt = new JButton("Encrypt");
 	private JButton btn_decrypt = new JButton("Decrypt");
+	private JButton btn_encrypt_file = new JButton("Encrypt file");
+	private JButton btn_decrypt_file = new JButton("Decrypt file");
 	private GridBagConstraints gbc;
 
 	private JTextArea plainTextArea = new JTextArea(5, 20);
@@ -75,6 +78,7 @@ public class TabRSA extends JPanel {
 				jtf_private_key.setText(cKey.getPrivateKey().toString());
 				jtf_n_public.setText(cKey.getN().toString());
 				jtf_n_private.setText(cKey.getN().toString());
+				System.out.println("n = " + cKey.getN().toString().length());
 			}
 		});
 		btn_encrypt.addActionListener(new ActionListener() {
@@ -84,6 +88,7 @@ public class TabRSA extends JPanel {
 				encrRSA.EncryptText(plainTextArea.getText());
 				encryptedTextArea.setText(encrRSA.getEncryptedText());
 				cipherTextArea.setText(encrRSA.getEncryptedText());
+				System.out.println("encr text lenght = " + encrRSA.getEncryptedText().length());
 			}
 		});
 		btn_decrypt.addActionListener(new ActionListener() {
@@ -93,6 +98,30 @@ public class TabRSA extends JPanel {
 				decrRSA.DecryptText(cipherTextArea.getText());
 				decryptedTextArea.setText(decrRSA.getDecryptedText());
 
+			}
+		});
+		btn_encrypt_file.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				EncryptionRSA encrRSA = new EncryptionRSA(jtf_public_key.getText(), jtf_n_public.getText());
+				try {
+					encrRSA.EncryptFile("D:/image.png", "D:/new_file.png");
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		});
+		btn_decrypt_file.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				DecryptionRSA decrRSA = new DecryptionRSA(jtf_private_key.getText(), jtf_n_private.getText());
+				try {
+					decrRSA.DecryptFile("D:/new_file.png", "D:/decrypted.png");
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		});
 		gbc.gridx = 0;
@@ -147,5 +176,13 @@ public class TabRSA extends JPanel {
 		gbc.gridx = 2;
 		gbc.gridy = 4;
 		add(scrollDecryptedtextArea, gbc);
+		
+		gbc.gridx = 0;
+		gbc.gridy = 5;
+		add(btn_encrypt_file, gbc);
+		
+		gbc.gridx = 1;
+		gbc.gridy = 5;
+		add(btn_decrypt_file, gbc);
 	}
 }
