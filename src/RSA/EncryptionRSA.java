@@ -1,10 +1,12 @@
 package RSA;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
+import java.util.List;
 
 public class EncryptionRSA extends RSA {
 
@@ -15,6 +17,12 @@ public class EncryptionRSA extends RSA {
 	public EncryptionRSA(String e, String n) {
 		super.e = new BigInteger(e);
 		super.n = new BigInteger(n);
+	}
+
+	private BigInteger EncryptWithRSA(BigInteger message) {
+		// System.out.println("public key: (e, n) (" + e + "," + n + ")");
+		BigInteger c = message.modPow(e, n);
+		return c;
 	}
 
 	private byte[] getHexCode(String text) {
@@ -39,30 +47,6 @@ public class EncryptionRSA extends RSA {
 		encryptedText = EncryptWithRSA(bigNumber);
 	}
 
-	protected void showBytes(byte[] plain_text) {
-		StringBuffer strBuffer = new StringBuffer();
-		for (int j = 0; j < plain_text.length; j++) {
-			strBuffer.setLength(0);
-			strBuffer.append(Long.toHexString(plain_text[j]).toUpperCase());
-
-			System.out.print(strBuffer + " ");
-			strBuffer.setLength(0);
-		}
-		System.out.println("");
-	}
-
-	protected void showInts(int[] plain_text) {
-		StringBuffer strBuffer = new StringBuffer();
-		for (int j = 0; j < plain_text.length; j++) {
-			strBuffer.setLength(0);
-			strBuffer.append(Long.toHexString(plain_text[j]).toUpperCase());
-
-			System.out.print(strBuffer + " ");
-			strBuffer.setLength(0);
-		}
-		System.out.println("");
-	}
-
 	private void EncryptBytes(FileOutputStream fos, int currentBytes[]) throws IOException {
 		BigInteger number256 = BigInteger.valueOf(256);
 		BigInteger bigNumber;
@@ -70,17 +54,14 @@ public class EncryptionRSA extends RSA {
 		for (int i = 0; i < 16; i++) {
 			bigNumber = bigNumber.add(number256.pow(i).multiply(BigInteger.valueOf(currentBytes[i])));
 		}
-		//System.out.println("bigNumber: " + bigNumber);
-		// Encryption
 		BigInteger encryptedBigInt = EncryptWithRSA(bigNumber);
-		//System.out.println("encryptedBigInt: " + encryptedBigInt);
 		WriteFile(fos, encryptedBigInt);
 	}
 
-	public void EncryptFile(String inputFile, String outputPath) throws IOException {
+	private void creaingNewFiles(File inputFile, String outputPath) throws IOException {
+
 		InputStream is = new FileInputStream(inputFile);
 		FileOutputStream fos = new FileOutputStream(outputPath);
-
 		int value = 0;
 		int j = 0;
 		int bytesCounter = 0;
@@ -106,31 +87,32 @@ public class EncryptionRSA extends RSA {
 		}
 		fos.close();
 		is.close();
-		System.out.println();
 	}
 
-	public void WriteFile(FileOutputStream fos, BigInteger encryptedBigInt) throws IOException {
-		String outputStr;
-		if(encryptedBigInt.toString().length() < n.toString().length()) {
-			outputStr = "0" + encryptedBigInt.toString();
-		} else {
-			outputStr = encryptedBigInt.toString();
+	public void EncryptFiles(List<File> sourceFile, List<String> outputPath) {
+		for (int i = 0; i < sourceFile.size(); i++) {
+			try {
+				creaingNewFiles(sourceFile.get(i), outputPath.get(i));
+			} catch (IOException e) {
+			}
 		}
-		byte byteTemp;
-		for (int i = 0; i < outputStr.length(); i++) {
-			byteTemp = Byte.valueOf(outputStr.substring(i, i + 1));
-			fos.write(byteTemp);
-		}
+	}
 
+	private void WriteFile(FileOutputStream fos, BigInteger encryptedBigInt) throws IOException {
+		String outputStr = "";
+		String stringWithZero = "";
+		int countZero = n.toString().length() - encryptedBigInt.toString().length();
+		for (int i = 0; i < countZero; i++) {
+			stringWithZero += "0";
+		}
+		outputStr = stringWithZero + encryptedBigInt.toString();
+
+		for (int i = 0; i < outputStr.length(); i++) {
+			fos.write(Byte.valueOf(outputStr.substring(i, i + 1)));
+		}
 	}
 
 	public String getEncryptedText() {
 		return encryptedText.toString();
-	}
-
-	private BigInteger EncryptWithRSA(BigInteger message) {
-		// System.out.println("public key: (e, n) (" + e + "," + n + ")");
-		BigInteger c = message.modPow(e, n);
-		return c;
 	}
 }
