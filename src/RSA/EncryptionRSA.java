@@ -12,11 +12,24 @@ public class EncryptionRSA extends RSA {
 
 	private byte[] sourceTextHex;
 	private BigInteger encryptedText;
+	private BigInteger nCopy;
+	private int countOutPutBytes = 0;
+	private byte[] arrayOutPutBytes;
 
 	// Init public key
 	public EncryptionRSA(String e, String n) {
 		super.e = new BigInteger(e);
 		super.n = new BigInteger(n);
+		this.nCopy = new BigInteger(n);
+		countOutPutBytes = 0;
+		while (nCopy.compareTo(BigInteger.ZERO) == 1) {
+			nCopy = nCopy.shiftRight(8);
+			countOutPutBytes++;
+		}
+		countOutPutBytes += 1;
+		arrayOutPutBytes = new byte[countOutPutBytes];
+		System.out.println("countOutPutBytes from Encrypt = " + countOutPutBytes);
+
 	}
 
 	private BigInteger EncryptWithRSA(BigInteger message) {
@@ -51,15 +64,17 @@ public class EncryptionRSA extends RSA {
 		BigInteger number256 = BigInteger.valueOf(256);
 		BigInteger bigNumber;
 		bigNumber = BigInteger.valueOf(0);
+		// Translate 16 bytes to bigInt
 		for (int i = 0; i < 16; i++) {
 			bigNumber = bigNumber.add(number256.pow(i).multiply(BigInteger.valueOf(currentBytes[i])));
 		}
 		BigInteger encryptedBigInt = EncryptWithRSA(bigNumber);
+		// System.out.println("encryptedBigInt " +
+		// encryptedBigInt.toString().length());
 		WriteFile(fos, encryptedBigInt);
 	}
 
-	private void creaingNewFiles(File inputFile, String outputPath) throws IOException {
-
+	private void creatingNewFiles(File inputFile, String outputPath) throws IOException {
 		InputStream is = new FileInputStream(inputFile);
 		FileOutputStream fos = new FileOutputStream(outputPath);
 		int value = 0;
@@ -92,23 +107,19 @@ public class EncryptionRSA extends RSA {
 	public void EncryptFiles(List<File> sourceFile, List<String> outputPath) {
 		for (int i = 0; i < sourceFile.size(); i++) {
 			try {
-				creaingNewFiles(sourceFile.get(i), outputPath.get(i));
+				creatingNewFiles(sourceFile.get(i), outputPath.get(i));
 			} catch (IOException e) {
 			}
 		}
 	}
 
 	private void WriteFile(FileOutputStream fos, BigInteger encryptedBigInt) throws IOException {
-		String outputStr = "";
-		String stringWithZero = "";
-		int countZero = n.toString().length() - encryptedBigInt.toString().length();
-		for (int i = 0; i < countZero; i++) {
-			stringWithZero += "0";
+		arrayOutPutBytes = encryptedBigInt.toByteArray();
+		for (int i = 0; i < countOutPutBytes - arrayOutPutBytes.length; i++) {
+			fos.write(0);
 		}
-		outputStr = stringWithZero + encryptedBigInt.toString();
-
-		for (int i = 0; i < outputStr.length(); i++) {
-			fos.write(Byte.valueOf(outputStr.substring(i, i + 1)));
+		for (int i = 0; i < arrayOutPutBytes.length; i++) {
+			fos.write(arrayOutPutBytes[i]);
 		}
 	}
 

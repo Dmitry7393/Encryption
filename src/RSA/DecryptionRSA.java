@@ -11,11 +11,22 @@ import java.util.List;
 public class DecryptionRSA extends RSA {
 	private String stringDecryptedText;
 	private BigInteger resultDecryption;
-
+	
+	private BigInteger nCopy;
+	private int countOutPutBytes = 0;
+	private byte[] arrayOutPutBytes;
 	// Init private key
 	public DecryptionRSA(String d, String n) {
 		super.d = new BigInteger(d);
 		super.n = new BigInteger(n);
+		this.nCopy = new BigInteger(n);
+		countOutPutBytes = 0;
+		while (nCopy.compareTo(BigInteger.ZERO) == 1) {
+			nCopy = nCopy.shiftRight(8);
+			countOutPutBytes++;
+		}
+		countOutPutBytes += 1;
+		System.out.println("countOutPutBytes from Decrypt = " + countOutPutBytes);
 	}
 
 	private BigInteger DecryptWithRSA(BigInteger encryptedMessage) {
@@ -47,9 +58,8 @@ public class DecryptionRSA extends RSA {
 		return stringDecryptedText;
 	}
 
-	private void DecryptLine(FileOutputStream fos, BigInteger currentBigInt) throws IOException {
-
-		BigInteger decryptedBigInt = DecryptWithRSA(currentBigInt);
+	private void DecryptLine(FileOutputStream fos, byte[] arrayBytes128) throws IOException {
+		BigInteger decryptedBigInt = DecryptWithRSA(new BigInteger(arrayBytes128));
 		BigInteger b255 = BigInteger.valueOf(255);
 		byte[] tempBytes = new byte[16];
 		for (int i = 0; i < 16; i++) {
@@ -63,20 +73,23 @@ public class DecryptionRSA extends RSA {
 		FileOutputStream fos = new FileOutputStream(newPath);
 		int value = 0;
 		int bytesCounter = 0;
-		String str = "";
+		int j = 0;
+		arrayOutPutBytes = new byte[countOutPutBytes];
 		while ((value = is.read()) != -1) {
-			str += (byte) value;
-			if (bytesCounter == n.toString().length() - 1) {
-				DecryptLine(fos, new BigInteger(str));
+			arrayOutPutBytes[j] = (byte) value;
+			j++;
+			if (bytesCounter == countOutPutBytes-1) {
+				showBytes(arrayOutPutBytes);
+				DecryptLine(fos, arrayOutPutBytes);
 				bytesCounter = 0;
-				str = "";
+				j = 0;
 			} else {
 				bytesCounter++;
 			}
 		}
 		// if still got content - the last a few bytes
 		if (bytesCounter != 0) {
-			DecryptLine(fos, new BigInteger(str));
+			DecryptLine(fos, arrayOutPutBytes);
 		}
 		fos.close();
 		is.close();
