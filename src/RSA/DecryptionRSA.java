@@ -11,14 +11,17 @@ import java.util.List;
 public class DecryptionRSA extends RSA {
 	private String stringDecryptedText;
 	private BigInteger resultDecryption;
-	
+
 	private BigInteger nCopy;
 	private int countOutPutBytes = 0;
 	private byte[] arrayOutPutBytes;
+	private BigInteger value255;
+
 	// Init private key
 	public DecryptionRSA(String d, String n) {
 		super.d = new BigInteger(d);
 		super.n = new BigInteger(n);
+		value255 = BigInteger.valueOf(255);
 		this.nCopy = new BigInteger(n);
 		countOutPutBytes = 0;
 		while (nCopy.compareTo(BigInteger.ZERO) == 1) {
@@ -26,11 +29,9 @@ public class DecryptionRSA extends RSA {
 			countOutPutBytes++;
 		}
 		countOutPutBytes += 1;
-		System.out.println("countOutPutBytes from Decrypt = " + countOutPutBytes);
 	}
 
 	private BigInteger DecryptWithRSA(BigInteger encryptedMessage) {
-		// System.out.println("private key: (d, n) (" + d + "," + n + ")");
 		BigInteger m_decrypted = encryptedMessage.modPow(d, n);
 		return m_decrypted;
 	}
@@ -45,8 +46,6 @@ public class DecryptionRSA extends RSA {
 
 	public void DecryptText(String textInteger) {
 		resultDecryption = DecryptWithRSA(new BigInteger(textInteger));
-
-		BigInteger value255 = BigInteger.valueOf(255);
 		byte[] outputBytes = new byte[16];
 		for (int i = 0; i < 16; i++) {
 			outputBytes[i] = resultDecryption.shiftRight(i * 8).and(value255).byteValue();
@@ -60,10 +59,9 @@ public class DecryptionRSA extends RSA {
 
 	private void DecryptLine(FileOutputStream fos, byte[] arrayBytes128) throws IOException {
 		BigInteger decryptedBigInt = DecryptWithRSA(new BigInteger(arrayBytes128));
-		BigInteger b255 = BigInteger.valueOf(255);
 		byte[] tempBytes = new byte[16];
 		for (int i = 0; i < 16; i++) {
-			tempBytes[i] = decryptedBigInt.shiftRight(i * 8).and(b255).byteValue();
+			tempBytes[i] = decryptedBigInt.shiftRight(i * 8).and(value255).byteValue();
 		}
 		WriteFile(fos, tempBytes);
 	}
@@ -78,8 +76,7 @@ public class DecryptionRSA extends RSA {
 		while ((value = is.read()) != -1) {
 			arrayOutPutBytes[j] = (byte) value;
 			j++;
-			if (bytesCounter == countOutPutBytes-1) {
-				showBytes(arrayOutPutBytes);
+			if (bytesCounter == countOutPutBytes - 1) {
 				DecryptLine(fos, arrayOutPutBytes);
 				bytesCounter = 0;
 				j = 0;

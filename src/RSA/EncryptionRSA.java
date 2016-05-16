@@ -15,11 +15,13 @@ public class EncryptionRSA extends RSA {
 	private BigInteger nCopy;
 	private int countOutPutBytes = 0;
 	private byte[] arrayOutPutBytes;
-
+	private BigInteger number256;
+	private BigInteger bigNumber;
 	// Init public key
 	public EncryptionRSA(String e, String n) {
 		super.e = new BigInteger(e);
 		super.n = new BigInteger(n);
+		number256 = BigInteger.valueOf(256);
 		this.nCopy = new BigInteger(n);
 		countOutPutBytes = 0;
 		while (nCopy.compareTo(BigInteger.ZERO) == 1) {
@@ -27,13 +29,9 @@ public class EncryptionRSA extends RSA {
 			countOutPutBytes++;
 		}
 		countOutPutBytes += 1;
-		arrayOutPutBytes = new byte[countOutPutBytes];
-		System.out.println("countOutPutBytes from Encrypt = " + countOutPutBytes);
-
 	}
 
 	private BigInteger EncryptWithRSA(BigInteger message) {
-		// System.out.println("public key: (e, n) (" + e + "," + n + ")");
 		BigInteger c = message.modPow(e, n);
 		return c;
 	}
@@ -60,18 +58,13 @@ public class EncryptionRSA extends RSA {
 		encryptedText = EncryptWithRSA(bigNumber);
 	}
 
-	private void EncryptBytes(FileOutputStream fos, int currentBytes[]) throws IOException {
-		BigInteger number256 = BigInteger.valueOf(256);
-		BigInteger bigNumber;
-		bigNumber = BigInteger.valueOf(0);
+	private void EncryptBytes(FileOutputStream fos, int currentBytes[]) throws IOException {	
+		 bigNumber = BigInteger.valueOf(0);
 		// Translate 16 bytes to bigInt
 		for (int i = 0; i < 16; i++) {
 			bigNumber = bigNumber.add(number256.pow(i).multiply(BigInteger.valueOf(currentBytes[i])));
 		}
-		BigInteger encryptedBigInt = EncryptWithRSA(bigNumber);
-		// System.out.println("encryptedBigInt " +
-		// encryptedBigInt.toString().length());
-		WriteFile(fos, encryptedBigInt);
+		WriteFile(fos, EncryptWithRSA(bigNumber));
 	}
 
 	private void creatingNewFiles(File inputFile, String outputPath) throws IOException {
@@ -91,7 +84,6 @@ public class EncryptionRSA extends RSA {
 				for (int i = 0; i < 16; i++) {
 					currentBytes[i] = 0;
 				}
-
 			} else {
 				bytesCounter++;
 			}

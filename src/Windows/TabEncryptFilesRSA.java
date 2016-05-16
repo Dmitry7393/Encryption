@@ -19,7 +19,6 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JSeparator;
 import javax.swing.JTextField;
 import RSA.CreateKeys;
 import RSA.DecryptionRSA;
@@ -73,7 +72,6 @@ public class TabEncryptFilesRSA extends JPanel {
 				jtf_private_key.setText(cKey.getPrivateKey().toString());
 				jtf_n_public.setText(cKey.getN().toString());
 				jtf_n_private.setText(cKey.getN().toString());
-				System.out.println("n = " + cKey.getN().toString().length());
 			}
 		});
 		btn_choose_files_to_encrypt.addActionListener(new ActionListener() {

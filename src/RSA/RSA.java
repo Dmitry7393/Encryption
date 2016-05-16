@@ -67,13 +67,7 @@ public class RSA {
 		// System.out.println("d = " + d);
 	}
 	protected void showBytes(byte[] plain_text) {
-		//StringBuffer strBuffer = new StringBuffer();
 		for (int j = 0; j < plain_text.length; j++) {
-			/*strBuffer.setLength(0);
-			strBuffer.append(Long.toHexString(plain_text[j]).toUpperCase());
-
-			System.out.print(strBuffer + " ");
-			strBuffer.setLength(0);*/
 			System.out.print(String.format("0x%02X", plain_text[j]));
 			System.out.print(" ");
 		}
