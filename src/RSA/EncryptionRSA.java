@@ -6,9 +6,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
-public class EncryptionRSA extends RSA {
+import javax.swing.JOptionPane;
+
+public class EncryptionRSA extends RSA implements Runnable {
 
 	private byte[] sourceTextHex;
 	private BigInteger encryptedText;
@@ -17,6 +20,10 @@ public class EncryptionRSA extends RSA {
 	private byte[] arrayOutPutBytes;
 	private BigInteger number256;
 	private BigInteger bigNumber;
+	private Thread thread;
+	private List<File> sourceFilesList = new ArrayList<File>();
+	private List<String> outputPathsList = new ArrayList<String>();
+	
 	// Init public key
 	public EncryptionRSA(String e, String n) {
 		super.e = new BigInteger(e);
@@ -61,7 +68,7 @@ public class EncryptionRSA extends RSA {
 	private void EncryptBytes(FileOutputStream fos, int currentBytes[]) throws IOException {	
 		 bigNumber = BigInteger.valueOf(0);
 		// Translate 16 bytes to bigInt
-		for (int i = 0; i < 16; i++) {
+		for (int i = 0; i < currentBytes.length; i++) {
 			bigNumber = bigNumber.add(number256.pow(i).multiply(BigInteger.valueOf(currentBytes[i])));
 		}
 		WriteFile(fos, EncryptWithRSA(bigNumber));
@@ -73,15 +80,15 @@ public class EncryptionRSA extends RSA {
 		int value = 0;
 		int j = 0;
 		int bytesCounter = 0;
-		int currentBytes[] = new int[16];
+		int currentBytes[] = new int[SIZE_BLOCK];
 		while ((value = is.read()) != -1) {
 			currentBytes[j] = value; // read 16 bytes from file
 			j++;
-			if (bytesCounter == 15) {
+			if (bytesCounter == SIZE_BLOCK-1) {
 				EncryptBytes(fos, currentBytes);
 				bytesCounter = 0;
 				j = 0;
-				for (int i = 0; i < 16; i++) {
+				for (int i = 0; i < SIZE_BLOCK; i++) {
 					currentBytes[i] = 0;
 				}
 			} else {
@@ -97,16 +104,15 @@ public class EncryptionRSA extends RSA {
 	}
 
 	public void EncryptFiles(List<File> sourceFile, List<String> outputPath) {
-		for (int i = 0; i < sourceFile.size(); i++) {
-			try {
-				creatingNewFiles(sourceFile.get(i), outputPath.get(i));
-			} catch (IOException e) {
-			}
-		}
+		this.sourceFilesList = sourceFile;
+		this.outputPathsList = outputPath;
+		thread = new Thread(this, "Encryption RSA");
+		thread.start();
 	}
 
 	private void WriteFile(FileOutputStream fos, BigInteger encryptedBigInt) throws IOException {
 		arrayOutPutBytes = encryptedBigInt.toByteArray();
+		//System.out.println("l " + arrayOutPutBytes.length);
 		for (int i = 0; i < countOutPutBytes - arrayOutPutBytes.length; i++) {
 			fos.write(0);
 		}
@@ -117,5 +123,16 @@ public class EncryptionRSA extends RSA {
 
 	public String getEncryptedText() {
 		return encryptedText.toString();
+	}
+
+	@Override
+	public void run() {
+		for (int i = 0; i < sourceFilesList.size(); i++) {
+			try {
+				creatingNewFiles(sourceFilesList.get(i), outputPathsList.get(i));
+			} catch (IOException e) {
+			}
+		}
+		JOptionPane.showMessageDialog(null, "Files were encrypted!!!");
 	}
 }

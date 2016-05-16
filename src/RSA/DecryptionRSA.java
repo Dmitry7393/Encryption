@@ -6,9 +6,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
-public class DecryptionRSA extends RSA {
+import javax.swing.JOptionPane;
+
+public class DecryptionRSA extends RSA implements Runnable {
 	private String stringDecryptedText;
 	private BigInteger resultDecryption;
 
@@ -16,6 +19,9 @@ public class DecryptionRSA extends RSA {
 	private int countOutPutBytes = 0;
 	private byte[] arrayOutPutBytes;
 	private BigInteger value255;
+	private Thread thread;
+	private List<File> sourceFilesList = new ArrayList<File>();
+	private List<String> outputPathsList = new ArrayList<String>();
 
 	// Init private key
 	public DecryptionRSA(String d, String n) {
@@ -59,8 +65,8 @@ public class DecryptionRSA extends RSA {
 
 	private void DecryptLine(FileOutputStream fos, byte[] arrayBytes128) throws IOException {
 		BigInteger decryptedBigInt = DecryptWithRSA(new BigInteger(arrayBytes128));
-		byte[] tempBytes = new byte[16];
-		for (int i = 0; i < 16; i++) {
+		byte[] tempBytes = new byte[SIZE_BLOCK];
+		for (int i = 0; i < SIZE_BLOCK; i++) {
 			tempBytes[i] = decryptedBigInt.shiftRight(i * 8).and(value255).byteValue();
 		}
 		WriteFile(fos, tempBytes);
@@ -93,17 +99,26 @@ public class DecryptionRSA extends RSA {
 	}
 
 	public void DecryptFiles(List<File> sourceFile, List<String> outputPath) {
-		for (int i = 0; i < sourceFile.size(); i++) {
-			try {
-				createDecryptedFiles(sourceFile.get(i), outputPath.get(i));
-			} catch (IOException e) {
-			}
-		}
+		this.sourceFilesList = sourceFile;
+		this.outputPathsList = outputPath;
+		thread = new Thread(this, "Decryption RSA");
+		thread.start();
 	}
 
 	private void WriteFile(FileOutputStream fos, byte[] arrayBytes) throws IOException {
-		for (int i = 0; i < 16; i++) {
+		for (int i = 0; i < SIZE_BLOCK; i++) {
 			fos.write(arrayBytes[i]);
 		}
+	}
+
+	@Override
+	public void run() {
+		for (int i = 0; i < sourceFilesList.size(); i++) {
+			try {
+				createDecryptedFiles(sourceFilesList.get(i), outputPathsList.get(i));
+			} catch (IOException e) {
+			}
+		}
+		JOptionPane.showMessageDialog(null, "Files were decrypted!!!");
 	}
 }

@@ -14,7 +14,8 @@ public class RSA {
 
 	private static final int KEY_SIZE = 32;
 	private static final int P_Q_SIZE = 512;
-
+	protected static final int SIZE_BLOCK = 64;
+	
 	public BigInteger getRandomBigInteger(int pow) {
 		Random rand = new Random();
 		BigInteger result = new BigInteger(pow, rand); // (2^4-1) = 15 is the
