@@ -20,8 +20,10 @@ public class DecryptionRSA extends RSA implements Runnable {
 	private Thread thread;
 	private List<File> sourceFilesList = new ArrayList<File>();
 	private List<String> outputPathsList = new ArrayList<String>();
+	private BigInteger decryptedBigInt;
+	private byte[] decryptedBytes;
 	private long currentSizeOfFiles = 0;
-
+	
 	// Init private key
 	public DecryptionRSA(String d, String n) {
 		super.d = new BigInteger(d);
@@ -34,6 +36,7 @@ public class DecryptionRSA extends RSA implements Runnable {
 			countOutPutBytes++;
 		}
 		countOutPutBytes += 1;
+		decryptedBytes = new byte[SIZE_BLOCK];
 	}
 
 	private BigInteger DecryptWithRSA(BigInteger encryptedMessage) {
@@ -51,8 +54,15 @@ public class DecryptionRSA extends RSA implements Runnable {
 
 	public void DecryptText(String textInteger) {
 		resultDecryption = DecryptWithRSA(new BigInteger(textInteger));
-		byte[] outputBytes = new byte[16];
-		for (int i = 0; i < 16; i++) {
+		int countBytes = 0;
+		
+		BigInteger copyDecryption = resultDecryption;
+		while (copyDecryption.compareTo(BigInteger.ZERO) == 1) {
+			copyDecryption = copyDecryption.shiftRight(8);
+			countBytes++;
+		}
+		byte[] outputBytes = new byte[countBytes];
+		for (int i = 0; i < outputBytes.length; i++) {
 			outputBytes[i] = resultDecryption.shiftRight(i * 8).and(value255).byteValue();
 		}
 		stringDecryptedText = hexToString(outputBytes);
@@ -63,12 +73,11 @@ public class DecryptionRSA extends RSA implements Runnable {
 	}
 
 	private void DecryptLine(FileOutputStream fos, byte[] arrayBytes128) throws IOException {
-		BigInteger decryptedBigInt = DecryptWithRSA(new BigInteger(arrayBytes128));
-		byte[] tempBytes = new byte[SIZE_BLOCK];
+		decryptedBigInt = DecryptWithRSA(new BigInteger(arrayBytes128));
 		for (int i = 0; i < SIZE_BLOCK; i++) {
-			tempBytes[i] = decryptedBigInt.shiftRight(i * 8).and(value255).byteValue();
+			decryptedBytes[i] = decryptedBigInt.shiftRight(i * 8).and(value255).byteValue();
 		}
-		WriteFile(fos, tempBytes);
+		WriteFile(fos, decryptedBytes);
 	}
 
 	private void createDecryptedFiles(File encryptedFile, String newPath) throws IOException {
@@ -85,6 +94,7 @@ public class DecryptionRSA extends RSA implements Runnable {
 				currentSizeOfFiles += countOutPutBytes;
 				DecryptLine(fos, arrayOutPutBytes);
 				bytesCounter = 0;
+				arrayOutPutBytes = new byte[countOutPutBytes]; 
 				j = 0;
 			} else {
 				bytesCounter++;
@@ -105,12 +115,6 @@ public class DecryptionRSA extends RSA implements Runnable {
 		thread.start();
 	}
 
-	private void WriteFile(FileOutputStream fos, byte[] arrayBytes) throws IOException {
-		for (int i = 0; i < SIZE_BLOCK; i++) {
-			fos.write(arrayBytes[i]);
-		}
-	}
-
 	@Override
 	public void run() {
 		for (int i = 0; i < sourceFilesList.size(); i++) {
@@ -121,6 +125,11 @@ public class DecryptionRSA extends RSA implements Runnable {
 		}
 	}
 
+	private void WriteFile(FileOutputStream fos, byte[] arrayBytes) throws IOException {
+		for (int i = 0; i < SIZE_BLOCK; i++) {
+			fos.write(arrayBytes[i]);
+		}
+	}
 	public long getCurrentSizeOfEncryptedFiles() {
 		return currentSizeOfFiles;
 	}

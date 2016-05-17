@@ -16,7 +16,7 @@ public class EncryptionRSA extends RSA implements Runnable {
 	private BigInteger nCopy;
 	private int countOutPutBytes = 0;
 	private byte[] arrayOutPutBytes;
-	private BigInteger number256;
+	private BigInteger value256;
 	private BigInteger bigNumber;
 	private Thread thread;
 	private List<File> sourceFilesList = new ArrayList<File>();
@@ -28,7 +28,7 @@ public class EncryptionRSA extends RSA implements Runnable {
 	public EncryptionRSA(String e, String n) {
 		super.e = new BigInteger(e);
 		super.n = new BigInteger(n);
-		number256 = BigInteger.valueOf(256);
+		value256 = BigInteger.valueOf(256);
 		this.nCopy = new BigInteger(n);
 		countOutPutBytes = 0;
 		while (nCopy.compareTo(BigInteger.ZERO) == 1) {
@@ -58,18 +58,17 @@ public class EncryptionRSA extends RSA implements Runnable {
 	public void EncryptText(String text) {
 		sourceTextHex = getHexCode(text);
 		BigInteger bigNumber = BigInteger.valueOf(0);
-		BigInteger number256 = BigInteger.valueOf(256);
 		for (int i = 0; i < sourceTextHex.length; i++) {
-			bigNumber = bigNumber.add(number256.pow(i).multiply(BigInteger.valueOf(sourceTextHex[i])));
+			bigNumber = bigNumber.add(value256.pow(i).multiply(BigInteger.valueOf(sourceTextHex[i])));
 		}
 		encryptedText = EncryptWithRSA(bigNumber);
 	}
 
 	private void EncryptBytes(FileOutputStream fos, int currentBytes[]) throws IOException {
 		bigNumber = BigInteger.valueOf(0);
-		// Translate 16 bytes to bigInt
+		// Translate bytes to bigInt
 		for (int i = 0; i < currentBytes.length; i++) {
-			bigNumber = bigNumber.add(number256.pow(i).multiply(BigInteger.valueOf(currentBytes[i])));
+			bigNumber = bigNumber.add(value256.pow(i).multiply(BigInteger.valueOf(currentBytes[i])));
 		}
 		WriteFile(fos, EncryptWithRSA(bigNumber));
 	}
