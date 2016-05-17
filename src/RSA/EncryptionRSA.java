@@ -9,8 +9,6 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.JOptionPane;
-
 public class EncryptionRSA extends RSA implements Runnable {
 
 	private byte[] sourceTextHex;
@@ -23,7 +21,9 @@ public class EncryptionRSA extends RSA implements Runnable {
 	private Thread thread;
 	private List<File> sourceFilesList = new ArrayList<File>();
 	private List<String> outputPathsList = new ArrayList<String>();
-	
+	// Get count of bytes that we have read
+	private long currentSizeOfFiles = 0;
+
 	// Init public key
 	public EncryptionRSA(String e, String n) {
 		super.e = new BigInteger(e);
@@ -65,8 +65,8 @@ public class EncryptionRSA extends RSA implements Runnable {
 		encryptedText = EncryptWithRSA(bigNumber);
 	}
 
-	private void EncryptBytes(FileOutputStream fos, int currentBytes[]) throws IOException {	
-		 bigNumber = BigInteger.valueOf(0);
+	private void EncryptBytes(FileOutputStream fos, int currentBytes[]) throws IOException {
+		bigNumber = BigInteger.valueOf(0);
 		// Translate 16 bytes to bigInt
 		for (int i = 0; i < currentBytes.length; i++) {
 			bigNumber = bigNumber.add(number256.pow(i).multiply(BigInteger.valueOf(currentBytes[i])));
@@ -82,9 +82,10 @@ public class EncryptionRSA extends RSA implements Runnable {
 		int bytesCounter = 0;
 		int currentBytes[] = new int[SIZE_BLOCK];
 		while ((value = is.read()) != -1) {
-			currentBytes[j] = value; // read 16 bytes from file
+			currentBytes[j] = value; // read SIZE_BLOCK bytes from file
 			j++;
-			if (bytesCounter == SIZE_BLOCK-1) {
+			if (bytesCounter == SIZE_BLOCK - 1) {
+				currentSizeOfFiles += SIZE_BLOCK;
 				EncryptBytes(fos, currentBytes);
 				bytesCounter = 0;
 				j = 0;
@@ -112,7 +113,7 @@ public class EncryptionRSA extends RSA implements Runnable {
 
 	private void WriteFile(FileOutputStream fos, BigInteger encryptedBigInt) throws IOException {
 		arrayOutPutBytes = encryptedBigInt.toByteArray();
-		//System.out.println("l " + arrayOutPutBytes.length);
+		// System.out.println("l " + arrayOutPutBytes.length);
 		for (int i = 0; i < countOutPutBytes - arrayOutPutBytes.length; i++) {
 			fos.write(0);
 		}
@@ -133,6 +134,13 @@ public class EncryptionRSA extends RSA implements Runnable {
 			} catch (IOException e) {
 			}
 		}
-		JOptionPane.showMessageDialog(null, "Files were encrypted!!!");
+	}
+
+	public long getCurrentSizeOfEncryptedFiles() {
+		return currentSizeOfFiles;
+	}
+
+	public Boolean threadIsAlive() {
+		return thread.isAlive();
 	}
 }

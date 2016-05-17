@@ -9,8 +9,6 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.JOptionPane;
-
 public class DecryptionRSA extends RSA implements Runnable {
 	private String stringDecryptedText;
 	private BigInteger resultDecryption;
@@ -22,6 +20,7 @@ public class DecryptionRSA extends RSA implements Runnable {
 	private Thread thread;
 	private List<File> sourceFilesList = new ArrayList<File>();
 	private List<String> outputPathsList = new ArrayList<String>();
+	private long currentSizeOfFiles = 0;
 
 	// Init private key
 	public DecryptionRSA(String d, String n) {
@@ -83,6 +82,7 @@ public class DecryptionRSA extends RSA implements Runnable {
 			arrayOutPutBytes[j] = (byte) value;
 			j++;
 			if (bytesCounter == countOutPutBytes - 1) {
+				currentSizeOfFiles += countOutPutBytes;
 				DecryptLine(fos, arrayOutPutBytes);
 				bytesCounter = 0;
 				j = 0;
@@ -119,6 +119,13 @@ public class DecryptionRSA extends RSA implements Runnable {
 			} catch (IOException e) {
 			}
 		}
-		JOptionPane.showMessageDialog(null, "Files were decrypted!!!");
+	}
+
+	public long getCurrentSizeOfEncryptedFiles() {
+		return currentSizeOfFiles;
+	}
+
+	public Boolean threadIsAlive() {
+		return thread.isAlive();
 	}
 }
