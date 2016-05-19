@@ -18,6 +18,7 @@ public class DecryptionRSA extends RSA implements Runnable {
 	private byte[] arrayOutPutBytes;
 	private BigInteger value255;
 	private Thread thread;
+	private double timeEcryption = 0;
 	private List<File> sourceFilesList = new ArrayList<File>();
 	private List<String> outputPathsList = new ArrayList<String>();
 	private BigInteger decryptedBigInt;
@@ -117,12 +118,15 @@ public class DecryptionRSA extends RSA implements Runnable {
 
 	@Override
 	public void run() {
+		final long startTime = System.currentTimeMillis();
 		for (int i = 0; i < sourceFilesList.size(); i++) {
 			try {
 				createDecryptedFiles(sourceFilesList.get(i), outputPathsList.get(i));
 			} catch (IOException e) {
 			}
 		}
+		final long endTime = System.currentTimeMillis();
+		timeEcryption = (endTime - startTime) / 1000.0;
 	}
 
 	private void WriteFile(FileOutputStream fos, byte[] arrayBytes) throws IOException {
@@ -136,5 +140,8 @@ public class DecryptionRSA extends RSA implements Runnable {
 
 	public Boolean threadIsAlive() {
 		return thread.isAlive();
+	}
+	public double getTimeEncryption() {
+		return timeEcryption;
 	}
 }

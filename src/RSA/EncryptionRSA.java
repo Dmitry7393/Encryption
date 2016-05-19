@@ -19,6 +19,7 @@ public class EncryptionRSA extends RSA implements Runnable {
 	private BigInteger value256;
 	private BigInteger bigNumber;
 	private Thread thread;
+	private double timeEcryption = 0;
 	private List<File> sourceFilesList = new ArrayList<File>();
 	private List<String> outputPathsList = new ArrayList<String>();
 	// Get count of bytes that we have read
@@ -127,12 +128,15 @@ public class EncryptionRSA extends RSA implements Runnable {
 
 	@Override
 	public void run() {
+		final long startTime = System.currentTimeMillis();
 		for (int i = 0; i < sourceFilesList.size(); i++) {
 			try {
 				creatingNewFiles(sourceFilesList.get(i), outputPathsList.get(i));
 			} catch (IOException e) {
 			}
 		}
+		final long endTime = System.currentTimeMillis();
+		timeEcryption = (endTime - startTime) / 1000.0;
 	}
 
 	public long getCurrentSizeOfEncryptedFiles() {
@@ -141,5 +145,8 @@ public class EncryptionRSA extends RSA implements Runnable {
 
 	public Boolean threadIsAlive() {
 		return thread.isAlive();
+	}
+	public double getTimeEncryption() {
+		return timeEcryption;
 	}
 }

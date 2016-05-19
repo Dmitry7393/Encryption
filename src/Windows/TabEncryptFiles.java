@@ -22,7 +22,6 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -52,7 +51,6 @@ public class TabEncryptFiles extends JPanel {
 
 	private JTextField jtf_key;
 	private GridBagConstraints gbc;
-	private JCheckBox checkBoxArchive = new JCheckBox("Save files to archive");
 	private DefaultListModel<String> mDefaultListModel = new DefaultListModel<String>();
 	private DefaultTableModel mDefaultTableModel = new DefaultTableModel();
 	private Dimension dimenstionTable = new Dimension(230, 120);
@@ -80,7 +78,8 @@ public class TabEncryptFiles extends JPanel {
 				progressBar.setValue((int) valuePercent);
 				if (mEncryptFile.threadIsAlive() == false) {
 					((Timer) arg0.getSource()).stop();
-					JOptionPane.showMessageDialog(null, "Files were encrypted!!!");
+					JOptionPane.showMessageDialog(null,
+							"Files were encrypted in " + mEncryptFile.getTimeEncryption() + " seconds");
 					progressBar.setValue(0);
 					btn_stop_encryption.setEnabled(false);
 					btn_encrypt_files.setEnabled(true);
@@ -264,10 +263,6 @@ public class TabEncryptFiles extends JPanel {
 		gbc.gridx = 0;
 		gbc.gridy = 1;
 		add(btn_choose_files, gbc);
-
-		gbc.gridx = 1;
-		gbc.gridy = 3;
-		add(checkBoxArchive, gbc);
 
 		gbc.gridx = 1;
 		gbc.gridy = 5;

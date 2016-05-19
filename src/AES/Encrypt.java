@@ -16,7 +16,7 @@ public class Encrypt extends AES implements Runnable {
 	private List<File> sourceFilesList = new ArrayList<File>();
 	private List<String> outputPathsList = new ArrayList<String>();
 	private long CommonSizeOfFiles = 0;
-
+	private double timeEcryption = 0;
 	private static final int NB = 4;
 	private int keySize;
 	private int Nk;
@@ -89,12 +89,11 @@ public class Encrypt extends AES implements Runnable {
 		thread.start();
 	}
 
-	/*public void EncryptFile(File sourceFile, String outputFile) {
-		sourceFilesList.add(sourceFile);
-		outputPathsList.add(outputFile);
-		thread = new Thread(this, "Encryption file");
-		thread.start();
-	}*/
+	/*
+	 * public void EncryptFile(File sourceFile, String outputFile) {
+	 * sourceFilesList.add(sourceFile); outputPathsList.add(outputFile); thread
+	 * = new Thread(this, "Encryption file"); thread.start(); }
+	 */
 
 	public Encrypt(String key) {
 		if (key.length() <= 16) {
@@ -180,6 +179,7 @@ public class Encrypt extends AES implements Runnable {
 
 	@Override
 	public void run() {
+		final long startTime = System.currentTimeMillis();
 		for (int i = 0; i < sourceFilesList.size(); i++) {
 			if (!Thread.currentThread().isInterrupted()) {
 				try {
@@ -188,9 +188,9 @@ public class Encrypt extends AES implements Runnable {
 				} catch (IOException e) {
 				}
 			}
-
 		}
-		System.out.println("thread stopped");
+		final long endTime = System.currentTimeMillis();
+		timeEcryption = (endTime - startTime) / 1000.0;
 	}
 
 	public Boolean threadIsAlive() {
@@ -203,5 +203,9 @@ public class Encrypt extends AES implements Runnable {
 
 	public void stopEncryption() {
 		thread.interrupt();
+	}
+
+	public double getTimeEncryption() {
+		return timeEcryption;
 	}
 }

@@ -91,7 +91,8 @@ public class TabEncryptFilesRSA extends JPanel {
 				progressBarEncryption.setValue((int) valuePercent);
 				if (encryptRSA.threadIsAlive() == false) {
 					((Timer) arg0.getSource()).stop();
-					JOptionPane.showMessageDialog(null, "Files were encrypted!!!");
+					JOptionPane.showMessageDialog(null,
+							"Files were encrypted in " + encryptRSA.getTimeEncryption() + " seconds");
 					progressBarEncryption.setValue(0);
 				}
 			}
@@ -111,7 +112,8 @@ public class TabEncryptFilesRSA extends JPanel {
 				progressBarDecryption.setValue((int) valuePercent);
 				if (decryptRSA.threadIsAlive() == false) {
 					((Timer) arg0.getSource()).stop();
-					JOptionPane.showMessageDialog(null, "Files were decrypted!!!");
+					JOptionPane.showMessageDialog(null,
+							"Files were decrypted in " + decryptRSA.getTimeEncryption() + " seconds");
 					progressBarDecryption.setValue(0);
 				}
 			}

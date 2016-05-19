@@ -15,7 +15,7 @@ public class Decrypt extends AES implements Runnable {
 	private List<File> sourceFilesList = new ArrayList<File>();
 	private List<String> outputPathList = new ArrayList<String>();
 	private long CommonSizeOfFiles = 0;
-
+	private double timeEcryption = 0;
 	private static final int NB = 4;
 	private int keySize;
 	private int Nk;
@@ -189,6 +189,7 @@ public class Decrypt extends AES implements Runnable {
 
 	@Override
 	public void run() {
+		final long startTime = System.currentTimeMillis();
 		for (int i = 0; i < sourceFilesList.size(); i++) {
 			if (!Thread.currentThread().isInterrupted()) {
 				try {
@@ -196,8 +197,9 @@ public class Decrypt extends AES implements Runnable {
 				} catch (IOException e) {
 				}
 			}
-
 		}
+		final long endTime = System.currentTimeMillis();
+		timeEcryption = (endTime - startTime) / 1000.0;
 	}
 
 	public Boolean threadIsAlive() {
@@ -207,7 +209,12 @@ public class Decrypt extends AES implements Runnable {
 	public long getCommonSizeOfFiles() {
 		return CommonSizeOfFiles;
 	}
+
 	public void stopDecryption() {
 		thread.interrupt();
+	}
+
+	public double getTimeEncryption() {
+		return timeEcryption;
 	}
 }
