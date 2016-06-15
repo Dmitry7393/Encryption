@@ -86,19 +86,14 @@ public class AES {
 	}
 
 	protected static void show(byte[][] plain_text) {
-		StringBuffer strBuffer = new StringBuffer();
 		for (int j = 0; j < 4; j++) {
 			for (int i = 0; i < 4; i++) {
-				strBuffer.setLength(0);
-				strBuffer.append(Long.toHexString(plain_text[i][j]).toUpperCase());
-
-				System.out.print(strBuffer + " ");
-				strBuffer.setLength(0);
+				System.out.print(String.format("0x%02X", plain_text[i][j]));
+				System.out.print(" ");
 			}
 		}
 		System.out.println("");
 	}
-
 	/*
 	 * private static void show2(byte[] plain_text) { StringBuffer strBuffer =
 	 * new StringBuffer(); for(int i = 0; i < plain_text.length; i++) {

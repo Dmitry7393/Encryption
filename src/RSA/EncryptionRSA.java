@@ -62,6 +62,7 @@ public class EncryptionRSA extends RSA implements Runnable {
 		for (int i = 0; i < sourceTextHex.length; i++) {
 			bigNumber = bigNumber.add(value256.pow(i).multiply(BigInteger.valueOf(sourceTextHex[i])));
 		}
+		System.out.println("bigNumber " + bigNumber);
 		encryptedText = EncryptWithRSA(bigNumber);
 	}
 
